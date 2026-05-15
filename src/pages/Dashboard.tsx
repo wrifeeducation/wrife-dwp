@@ -1,86 +1,112 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
 import HomeNav from '@/components/shell/HomeNav'
 import StatsChips from '@/components/dashboard/StatsChips'
-import UnitBanner from '@/components/dashboard/UnitBanner'
-import PathNode from '@/components/dashboard/PathNode'
-import PathConnector from '@/components/dashboard/PathConnector'
+import TierBanner from '@/components/dashboard/TierBanner'
+import WindingPath from '@/components/dashboard/WindingPath'
+import ProgressHero from '@/components/dashboard/ProgressHero'
+import PathSprite from '@/components/dashboard/PathSprite'
 import { useLevels } from '@/hooks/useLevels'
 import { useProgress } from '@/hooks/useProgress'
 import { deriveLevelStates, groupByTier } from '@/lib/progress/levels'
+import { supabase } from '@/lib/supabase'
 
 /**
- * DWP Dashboard — scrolling vertical level path of 40 nodes grouped by tier.
- * WriFe World patterns 1, 4. Background pale purple behind the path area.
+ * Redesigned DWP dashboard. From top to bottom:
+ *   - Sticky top bar: mascot home pill, "WriFe World", stats chips
+ *   - Daily Prompt + My Garden CTA tiles
+ *   - Progress hero card with greeting, progress bar, Quick Resume
+ *   - Per-tier chapter banner + winding level path with mascot sprites
+ *
+ * Visually mirrors the energy of PWP Studio's chapter map while adding
+ * the staggered Duolingo-style path that primary pupils respond to.
  */
 export default function Dashboard() {
   const { levels, loading: lLoading, error: lErr } = useLevels()
   const { progress, loading: pLoading } = useProgress()
+  const [pupilName, setPupilName] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadName() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const meta = user.user_metadata?.display_name as string | undefined
+      if (meta) { if (!cancelled) setPupilName(meta); return }
+      const { data: pupil } = await supabase.from('pupils').select('display_name').eq('auth_user_id', user.id).maybeSingle()
+      if (!cancelled && pupil?.display_name) setPupilName(pupil.display_name)
+    }
+    loadName()
+    return () => { cancelled = true }
+  }, [])
 
   if (lLoading || pLoading) return <LoadingShell />
   if (lErr) return <ErrorShell error={lErr.message} />
-  if (!levels) return <ErrorShell error="No levels found." />
+  if (!levels || levels.length === 0) return <ErrorShell error="No levels found." />
 
   const states = deriveLevelStates(levels, progress)
   const grouped = groupByTier(levels)
   const tierKeys = [...grouped.keys()].sort((a, b) => a - b)
 
   return (
-    <main className="min-h-screen bg-surface-pupil">
-      {/* Top stats bar */}
-      <header className="bg-brand-primary text-white px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <BackToWriFe />
-          <HomeNav />
-          <span className="font-extrabold text-pwp-md">WriFe World</span>
+    <main className="min-h-screen bg-surface-pupil pb-12">
+      {/* Top bar */}
+      <header className="bg-brand-primary text-white px-4 py-3 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <BackToWriFe />
+            <HomeNav />
+            <span className="font-extrabold text-pwp-md hidden sm:inline">WriFe World</span>
+          </div>
+          <StatsChips
+            streak={progress?.current_streak_days ?? 0}
+            xp={progress?.xp_total ?? 0}
+          />
         </div>
-        <StatsChips
-          streak={progress?.current_streak_days ?? 0}
-          xp={progress?.xp_total ?? 0}
-        />
       </header>
 
-      {/* Daily prompt + garden tabs */}
-      <nav className="bg-white px-4 py-2 flex gap-2 border-b border-neutral-100">
-        <Link to="/daily" className="flex-1 text-center py-2 rounded-pwp-tile bg-mode-correct text-white text-pwp-sm font-extrabold"
+      {/* CTA tiles row */}
+      <nav className="max-w-3xl mx-auto px-4 mt-4 grid grid-cols-2 gap-2">
+        <Link to="/daily" className="text-center py-3 rounded-pwp-tile bg-mode-correct text-white text-pwp-sm font-extrabold"
               style={{ borderBottom: '3px solid #007d67' }}>
           📝 Today's prompt
         </Link>
-        <Link to="/garden" className="flex-1 text-center py-2 rounded-pwp-tile bg-brand-primary text-white text-pwp-sm font-extrabold"
+        <Link to="/garden" className="text-center py-3 rounded-pwp-tile bg-brand-primary text-white text-pwp-sm font-extrabold"
               style={{ borderBottom: '3px solid #3d35a0' }}>
           🌱 My Garden
         </Link>
       </nav>
 
-      {/* Path */}
-      <section className="bg-surface-path-bg px-5 py-6">
-        {tierKeys.map((tier) => {
+      {/* Main column */}
+      <section className="max-w-3xl mx-auto px-4 mt-5">
+        <ProgressHero progress={progress} totalLevels={levels.length} pupilName={pupilName ?? undefined} />
+
+        {tierKeys.map((tier, tIdx) => {
           const tierLevels = grouped.get(tier) ?? []
-          const isTierComplete = tierLevels.every((l) => states.get(l.level_id) === 'completed')
+          const completedInTier = tierLevels.filter((l) => states.get(l.level_id) === 'completed').length
+          const hasCurrentInTier = tierLevels.some((l) => states.get(l.level_id) === 'current')
+          const isTierComplete = completedInTier === tierLevels.length
+          const allLocked = !hasCurrentInTier && completedInTier === 0
+
           return (
             <div key={tier} className="mb-8">
-              <UnitBanner tier={tier} completed={isTierComplete} />
-              <div className="flex flex-col items-center">
-                {tierLevels.map((lvl, i) => {
-                  const state = states.get(lvl.level_id) ?? 'locked'
-                  const nextLvl = tierLevels[i + 1]
-                  const nextState = nextLvl ? states.get(nextLvl.level_id) ?? 'locked' : null
-                  const isLastInTier = !nextLvl
-                  return (
-                    <div key={lvl.level_id} className="flex flex-col items-center">
-                      <PathNode level={lvl} state={state} />
-                      {!isLastInTier && (
-                        <PathConnector state={state === 'completed' ? 'completed' : 'locked'} />
-                      )}
-                      {/* Show next-state connector colour better */}
-                      {!isLastInTier && state === 'completed' && nextState === 'current' && null}
-                    </div>
-                  )
-                })}
-              </div>
+              <TierBanner tier={tier} completedCount={completedInTier} totalCount={tierLevels.length} isComplete={isTierComplete} />
+              {/* Subtle decorative sprite — only on un-touched future tiers */}
+              {allLocked && tIdx > 0 && (
+                <div className="flex justify-center mb-3 -mt-1 opacity-60">
+                  <PathSprite pose="thinking" side="left" size={44} rotate={-6} />
+                </div>
+              )}
+              <WindingPath levels={tierLevels} states={states} />
             </div>
           )
         })}
+
+        {/* End-of-path mascot */}
+        <div className="flex justify-center mt-6 opacity-70">
+          <PathSprite pose="reading" side="left" size={64} />
+        </div>
       </section>
     </main>
   )
