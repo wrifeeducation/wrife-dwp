@@ -3,15 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "WriFe Daily Writing Practice — sub-app for the WriFe brand. dailywrite.wrife.co.uk",
+  "description": "WriFe Daily Writing Practice \u2014 sub-app for the WriFe brand. dailywrite.wrife.co.uk",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "supabase:types": "supabase gen types typescript --project-id $DWP_SUPABASE_PROJECT_REF --schema public > src/types/supabase.ts",
+    "supabase:types": "supabase gen types typescript --project-id gzmgjkbtsvezfclmreru --schema public > src/types/supabase.ts",
     "audio:generate": "tsx --env-file=.env scripts/generate-audio.ts",
-    "check-env": "tsx scripts/check-env.ts"
+    "check-env": "tsx scripts/check-env.ts",
+    "supabase:deploy": "supabase functions deploy --project-ref gzmgjkbtsvezfclmreru"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

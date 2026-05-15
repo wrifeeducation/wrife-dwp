@@ -1,25 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
-const url = import.meta.env.VITE_DWP_SUPABASE_URL
-const anonKey = import.meta.env.VITE_DWP_SUPABASE_ANON_KEY
+const url = import.meta.env.VITE_SUPABASE_URL
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!url || !anonKey) {
   throw new Error(
-    'Missing VITE_DWP_SUPABASE_URL or VITE_DWP_SUPABASE_ANON_KEY. ' +
-    'Copy .env.example to .env and fill in values from the DWP-specific Supabase project.'
+    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. ' +
+    'Copy .env.example to .env.local and fill in values from the shared WriFe Platform ' +
+    'Supabase project (gzmgjkbtsvezfclmreru). All WriFe sub-apps share one project.'
   )
 }
 
 /**
  * Single Supabase client for the DWP sub-app.
  *
- * Target: DWP's OWN Supabase project (separate from PWP, IP, wrife.co.uk).
- * DWP is a standalone product with its own auth, pupil registry, and tables.
+ * Target: gzmgjkbtsvezfclmreru — the SHARED WriFe Platform Supabase project.
+ * All WriFe sub-apps (PWP Studio, Interactive Practice, Daily Writing) share
+ * one Supabase instance so that:
+ *   - Route A hash-tokens minted by wrife.co.uk authenticate directly here
+ *   - The `pupils`, `classes`, and `home_accounts` tables are shared
+ *   - `learning_events` written here are readable by wrife.co.uk teacher views
  *
  * detectSessionInUrl: true is REQUIRED for Route A hash-token auto-detection.
- * The hash-token will be minted by the wrife.co.uk → DWP bridge Edge Function
- * once the SSO bridge is built (post-MVP integration phase).
+ * When a school pupil arrives from wrife.co.uk with a JWT in the URL hash,
+ * the Supabase SDK detects it automatically and calls setSession().
  */
 export const supabase = createClient<Database>(url, anonKey, {
   auth: {

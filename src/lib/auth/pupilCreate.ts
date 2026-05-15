@@ -19,12 +19,12 @@ export async function createPupil(args: {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new PupilCreateError('unauthenticated', 'Please sign in first.')
 
-  const url = `${import.meta.env.VITE_DWP_SUPABASE_URL}/functions/v1/pupil-create`
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pupil-create`
   const resp = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'apikey': import.meta.env.VITE_DWP_SUPABASE_ANON_KEY,
+      'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${session.access_token}`,
     },
     body: JSON.stringify({

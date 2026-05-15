@@ -17,7 +17,7 @@ interface SubmitArgs { levelId: string; submission: unknown; oralRehearsalTransc
 async function callAssess(body: Record<string, unknown>): Promise<AssessmentResult> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new Error('unauthenticated')
-  const url = `${import.meta.env.VITE_DWP_SUPABASE_URL}/functions/v1/dwp-assess-v2`
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dwp-assess`
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
