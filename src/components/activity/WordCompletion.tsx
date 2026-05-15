@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 import { WORD_CLASS_COLOURS, type WordClass } from '@/styles/wordClasses'
 
 interface CompletionItem {
@@ -17,7 +18,12 @@ interface CompletionItem {
  * is set). Tapping a chip slots it into the blank for that item.
  */
 export default function WordCompletion({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as CompletionItem[]) ?? []
+  const rawItems = (level.items as CompletionItem[]) ?? []
+  // Shuffle items AND each item's options at mount so the answer never sits at the same position
+  const items = useMemo(
+    () => shuffle(rawItems).map((it) => ({ ...it, options: shuffle(it.options) })),
+    [level.level_id]
+  )
   const [picks, setPicks] = useState<Record<number, string>>({})
 
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])

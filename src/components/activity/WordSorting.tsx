@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface SortItem { id: string; words: string[] }
 
@@ -24,7 +25,8 @@ const CATEGORY_META: Record<Category, CatMeta> = {
  *  - The "Pick a word, then tap a column" instruction sits on a pale-purple shelf
  */
 export default function WordSorting({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as SortItem[])[0]
+  const rawItems = (level.items as SortItem[])[0]
+  const items = useMemo(() => ({ ...rawItems, words: shuffle(rawItems.words) }), [level.level_id])
   const includeActions = level.activity_type === 'mixed_sorting'
   const categories: Category[] = includeActions
     ? ['people', 'places', 'things', 'actions']

@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface LogicItem { pair: string; answer: 'yes' | 'no' }
 
 export default function NounVerbLogic({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as LogicItem[]) ?? []
+  const rawItems = (level.items as LogicItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [picks, setPicks] = useState<Record<number, 'yes' | 'no'>>({})
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])
 

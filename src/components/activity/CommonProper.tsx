@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface CPItem { word: string; type: 'common' | 'proper' }
 
 export default function CommonProper({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as CPItem[]) ?? []
+  const rawItems = (level.items as CPItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [picks, setPicks] = useState<Record<number, 'common' | 'proper'>>({})
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface FixItem { input: string; target: string }
 
@@ -9,7 +10,8 @@ interface FixItem { input: string; target: string }
  * Pupil corrects → submit.
  */
 export default function SentenceFix({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as FixItem[]) ?? []
+  const rawItems = (level.items as FixItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [answers, setAnswers] = useState<string[]>(items.map((i) => i.input))
 
   return (

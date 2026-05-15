@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface StarterItem {
   starter: string         // e.g. "When " or "Although "
@@ -12,7 +13,8 @@ interface StarterItem {
  * "Although ___". Each item shows the starter as a fixed prefix.
  */
 export default function SentenceStarter({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as StarterItem[]) ?? []
+  const rawItems = (level.items as StarterItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [completions, setCompletions] = useState<Record<number, string>>({})
   const allReady = items.length > 0 && items.every((_, i) => (completions[i] ?? '').trim().length > 6)
 

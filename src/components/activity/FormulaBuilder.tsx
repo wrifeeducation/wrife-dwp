@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 import { WORD_CLASS_COLOURS, type WordClass } from '@/styles/wordClasses'
 
 interface FormulaItem {
@@ -14,7 +15,11 @@ interface FormulaItem {
  * slot of matching class. Tap a slot to clear it.
  */
 export default function FormulaBuilder({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as FormulaItem[]) ?? []
+  const rawItems = (level.items as FormulaItem[]) ?? []
+  const items = useMemo(
+    () => shuffle(rawItems).map((it) => ({ ...it, word_bank: shuffle(it.word_bank) })),
+    [level.level_id]
+  )
   const [placements, setPlacements] = useState<Record<number, string[]>>(() =>
     Object.fromEntries(items.map((it, i) => [i, new Array(it.formula.length).fill('')]))
   )

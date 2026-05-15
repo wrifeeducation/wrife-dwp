@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface VerbItem { sentence: string; verb: string }
 
@@ -9,7 +10,8 @@ interface VerbItem { sentence: string; verb: string }
  * The verb's chip turns into the canonical verb-red tile when selected.
  */
 export default function VerbIdentification({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as VerbItem[]) ?? []
+  const rawItems = (level.items as VerbItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [picks, setPicks] = useState<Record<number, string>>({})
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ActivityProps } from './types'
+import { shuffle } from '@/lib/progress/shuffle'
 
 interface JoinItem {
   sentence_a: string
@@ -8,7 +9,8 @@ interface JoinItem {
 }
 
 export default function SentenceJoin({ level, onSubmit, submitting }: ActivityProps) {
-  const items = (level.items as JoinItem[]) ?? []
+  const rawItems = (level.items as JoinItem[]) ?? []
+  const items = useMemo(() => shuffle(rawItems), [level.level_id])
   const [answers, setAnswers] = useState<Record<number, string>>({})
 
   return (
