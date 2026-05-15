@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
 import HomeNav from '@/components/shell/HomeNav'
 import StatsChips from '@/components/dashboard/StatsChips'
+import Sidebar from '@/components/dashboard/Sidebar'
 import TierBanner from '@/components/dashboard/TierBanner'
 import WindingPath from '@/components/dashboard/WindingPath'
 import ProgressHero from '@/components/dashboard/ProgressHero'
@@ -13,19 +14,15 @@ import { deriveLevelStates, groupByTier } from '@/lib/progress/levels'
 import { supabase } from '@/lib/supabase'
 
 /**
- * Redesigned DWP dashboard. From top to bottom:
- *   - Sticky top bar: mascot home pill, "WriFe World", stats chips
- *   - Daily Prompt + My Garden CTA tiles
- *   - Progress hero card with greeting, progress bar, Quick Resume
- *   - Per-tier chapter banner + winding level path with mascot sprites
+ * Pupil dashboard — two-column layout matching the PWP Studio pattern.
  *
- * Visually mirrors the energy of PWP Studio's chapter map while adding
- * the staggered Duolingo-style path that primary pupils respond to.
+ *   Desktop  : Sidebar (achievements) + Main (chapter cards + winding path)
+ *   Mobile   : Sidebar hidden; top header carries the stats chips + sign out
  */
 export default function Dashboard() {
   const { levels, loading: lLoading, error: lErr } = useLevels()
   const { progress, loading: pLoading } = useProgress()
-  const [pupilName, setPupilName] = useState<string | null>(null)
+  const [pupilName, setPupilName] = useState<string>('')
 
   useEffect(() => {
     let cancelled = false
@@ -50,74 +47,69 @@ export default function Dashboard() {
   const tierKeys = [...grouped.keys()].sort((a, b) => a - b)
 
   return (
-    <main className="min-h-screen bg-surface-pupil pb-12">
-      {/* Top bar */}
-      <header className="bg-brand-primary text-white px-4 py-3 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <BackToWriFe />
-            <HomeNav />
-            <span className="font-extrabold text-pwp-md hidden sm:inline">WriFe World</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <StatsChips
-              streak={progress?.current_streak_days ?? 0}
-              xp={progress?.xp_total ?? 0}
-            />
-            <button
-              onClick={() => supabase.auth.signOut().then(() => location.assign('/'))}
-              className="text-pwp-xs font-bold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-pwp-pill"
-              aria-label="Sign out"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-surface-pupil">
+      {/* Desktop sidebar — hidden on mobile via tailwind responsive class */}
+      <Sidebar pupilName={pupilName} progress={progress} />
 
-      {/* CTA tiles row */}
-      <nav className="max-w-3xl mx-auto px-4 mt-4 grid grid-cols-2 gap-2">
-        <Link to="/daily" className="text-center py-3 rounded-pwp-tile bg-mode-correct text-white text-pwp-sm font-extrabold"
-              style={{ borderBottom: '3px solid #007d67' }}>
-          📝 Today's prompt
-        </Link>
-        <Link to="/garden" className="text-center py-3 rounded-pwp-tile bg-brand-primary text-white text-pwp-sm font-extrabold"
-              style={{ borderBottom: '3px solid #3d35a0' }}>
-          🌱 My Garden
-        </Link>
-      </nav>
-
-      {/* Main column */}
-      <section className="max-w-3xl mx-auto px-4 mt-5">
-        <ProgressHero progress={progress} totalLevels={levels.length} pupilName={pupilName ?? undefined} />
-
-        {tierKeys.map((tier, tIdx) => {
-          const tierLevels = grouped.get(tier) ?? []
-          const completedInTier = tierLevels.filter((l) => states.get(l.level_id) === 'completed').length
-          const hasCurrentInTier = tierLevels.some((l) => states.get(l.level_id) === 'current')
-          const isTierComplete = completedInTier === tierLevels.length
-          const allLocked = !hasCurrentInTier && completedInTier === 0
-
-          return (
-            <div key={tier} className="mb-8">
-              <TierBanner tier={tier} completedCount={completedInTier} totalCount={tierLevels.length} isComplete={isTierComplete} />
-              {/* Subtle decorative sprite — only on un-touched future tiers */}
-              {allLocked && tIdx > 0 && (
-                <div className="flex justify-center mb-3 -mt-1 opacity-60">
-                  <PathSprite pose="thinking" side="left" size={44} rotate={-6} />
-                </div>
-              )}
-              <WindingPath levels={tierLevels} states={states} />
+      {/* Main content */}
+      <main className="flex-1 min-w-0 pb-12">
+        {/* Mobile-only top header (sidebar is hidden < md) */}
+        <header className="md:hidden bg-brand-primary text-white px-4 py-3 sticky top-0 z-10">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <BackToWriFe />
+              <HomeNav />
             </div>
-          )
-        })}
+            <div className="flex items-center gap-2">
+              <StatsChips streak={progress?.current_streak_days ?? 0} xp={progress?.xp_total ?? 0} />
+              <button
+                onClick={() => supabase.auth.signOut().then(() => location.assign('/'))}
+                className="text-pwp-xs font-bold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-pwp-pill"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </header>
 
-        {/* End-of-path mascot */}
-        <div className="flex justify-center mt-6 opacity-70">
-          <PathSprite pose="reading" side="left" size={64} />
-        </div>
-      </section>
-    </main>
+        {/* Mobile-only daily/garden tiles */}
+        <nav className="md:hidden max-w-3xl mx-auto px-4 mt-4 grid grid-cols-2 gap-2">
+          <Link to="/daily" className="text-center py-3 rounded-pwp-tile bg-mode-correct text-white text-pwp-sm font-extrabold"
+                style={{ borderBottom: '3px solid #007d67' }}>📝 Today's prompt</Link>
+          <Link to="/garden" className="text-center py-3 rounded-pwp-tile bg-brand-primary text-white text-pwp-sm font-extrabold"
+                style={{ borderBottom: '3px solid #3d35a0' }}>🌱 My Garden</Link>
+        </nav>
+
+        {/* Hero + tiers + path */}
+        <section className="max-w-3xl mx-auto px-4 md:px-6 mt-5 md:mt-8">
+          <ProgressHero progress={progress} totalLevels={levels.length} pupilName={pupilName || undefined} />
+
+          {tierKeys.map((tier, tIdx) => {
+            const tierLevels = grouped.get(tier) ?? []
+            const completedInTier = tierLevels.filter((l) => states.get(l.level_id) === 'completed').length
+            const hasCurrentInTier = tierLevels.some((l) => states.get(l.level_id) === 'current')
+            const isTierComplete = completedInTier === tierLevels.length
+            const allLocked = !hasCurrentInTier && completedInTier === 0
+
+            return (
+              <div key={tier} className="mb-8">
+                <TierBanner tier={tier} completedCount={completedInTier} totalCount={tierLevels.length} isComplete={isTierComplete} />
+                {allLocked && tIdx > 0 && (
+                  <div className="flex justify-center mb-3 -mt-1 opacity-60">
+                    <PathSprite pose="thinking" side="left" size={44} rotate={-6} />
+                  </div>
+                )}
+                <WindingPath levels={tierLevels} states={states} />
+              </div>
+            )
+          })}
+
+          <div className="flex justify-center mt-6 opacity-70">
+            <PathSprite pose="reading" side="left" size={64} />
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }
 
