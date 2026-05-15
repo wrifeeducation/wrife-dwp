@@ -14,8 +14,8 @@ DECLARE
   test_class_id UUID;
   test_pupil_id UUID;
   -- bcrypt hash of "1234" (cost 10). Pre-computed so this seed is reproducible.
-  -- Verified to match: $2b$10$L9/2iydiCRT9vVb3W8.nJ.KZABLX52N0szEIpTVVgspsQG5injdTW is "1234"
-  pin_hash_1234 TEXT := '$2b$10$L9/2iydiCRT9vVb3W8.nJ.KZABLX52N0szEIpTVVgspsQG5injdTW';
+  -- Verified to match: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy is "1234"
+  pin_hash_1234 TEXT := '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
 BEGIN
   -- Create the test home class if it doesn't exist. We use account_type='home'
   -- with a placeholder owner_id; but the CHECK constraint demands owner_id
