@@ -90,8 +90,20 @@ export default function PathNode({ level, state }: Props) {
       </Link>
     )
   }
+  if (state === 'completed') {
+    return (
+      <Link
+        to={`/level/${level.level_id}`}
+        className="group flex items-center gap-4 bg-white rounded-pwp-banner border border-brand-primary/15 p-3 transition-transform hover:-translate-y-0.5 hover:border-brand-primary/40"
+        aria-label={`Review Level ${level.level_number} — ${shortLevelTitle(level)}`}
+      >
+        {node}
+        {card}
+      </Link>
+    )
+  }
   return (
-    <div className={`flex items-center gap-4 rounded-pwp-banner p-3 ${state === 'completed' ? 'bg-white border border-brand-primary/15' : 'bg-neutral-50 border border-neutral-100'}`}>
+    <div className="flex items-center gap-4 rounded-pwp-banner p-3 bg-neutral-50 border border-neutral-100">
       {node}
       {card}
     </div>

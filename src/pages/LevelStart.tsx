@@ -3,6 +3,7 @@ import BackToWriFe from '@/components/shell/BackToWriFe'
 import HomeNav from '@/components/shell/HomeNav'
 import Mascot from '@/components/shell/Mascot'
 import { useLevel } from '@/hooks/useLevel'
+import { useProgress } from '@/hooks/useProgress'
 import TTSPlayer from '@/components/audio/TTSPlayer'
 import { levelIntroUrl } from '@/lib/audio/tts'
 import { TIER_TITLES } from '@/lib/progress/levels'
@@ -15,6 +16,7 @@ export default function LevelStart() {
   const { levelId } = useParams()
   const nav = useNavigate()
   const { level, loading, error } = useLevel(levelId)
+  const { progress } = useProgress()
 
   if (loading) return <Shell><p className="text-neutral-500">Loading…</p></Shell>
   if (error || !level) return <Shell><p className="text-red-700">Couldn't load this level.</p></Shell>
@@ -60,13 +62,28 @@ export default function LevelStart() {
         </div>
       </section>
 
-      {/* Start CTA */}
+      {/* Already-mastered banner */}
+      {progress?.levels_completed.includes(level.level_id) && (
+        <section className="px-5 mt-4">
+          <div className="bg-mode-correct/10 border-2 border-mode-correct rounded-pwp-tile px-4 py-3 flex items-center gap-3">
+            <span className="text-2xl" aria-hidden="true">🏆</span>
+            <div>
+              <p className="text-pwp-xs font-extrabold text-mode-correct-dark uppercase tracking-wide">You've mastered this</p>
+              <p className="text-pwp-xs text-neutral-700">Tap below to practise again — every attempt strengthens the skill.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA */}
       <section className="px-5 mt-6 mb-8">
         <button
           onClick={() => nav(`/level/${level.level_id}/practice`)}
           className="btn-wrife-cta"
         >
-          Start Level {level.level_number} →
+          {progress?.levels_completed.includes(level.level_id)
+            ? `Practise Level ${level.level_number} again →`
+            : `Start Level ${level.level_number} →`}
         </button>
       </section>
     </main>
