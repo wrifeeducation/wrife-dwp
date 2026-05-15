@@ -9,6 +9,10 @@ import WordCompletion from './WordCompletion'
 import FormulaBuilder from './FormulaBuilder'
 import SentenceJoin from './SentenceJoin'
 import SentenceOrdering from './SentenceOrdering'
+import StoryPlanner from './StoryPlanner'
+import SentenceStarter from './SentenceStarter'
+import SentenceVariety from './SentenceVariety'
+import ShowcaseNarrative from './ShowcaseNarrative'
 
 type ActivityComponent = React.ComponentType<{
   level: DwpLevel
@@ -17,12 +21,9 @@ type ActivityComponent = React.ComponentType<{
 }>
 
 /**
- * Maps activity_type → React component for the practice UI.
- *
- * Bespoke variants cover Tiers 1-5 (the levels with structured items). Tiers
- * 6-8 (story_beginning, bme_plan, narrative_showcase, etc.) intentionally
- * fall through to FreeWriting — those are open-composition tasks where the
- * pupil writes prose into a textarea.
+ * Maps every activity_type to the bespoke React component that renders it.
+ * FreeWriting remains the catch-all fallback only for activity types not
+ * explicitly mapped here.
  */
 const REGISTRY: Partial<Record<ActivityType, ActivityComponent>> = {
   // Tier 1
@@ -63,17 +64,21 @@ const REGISTRY: Partial<Record<ActivityType, ActivityComponent>> = {
   before_after: SentenceOrdering,
   five_sentence_recount: FreeWriting,
 
-  // Tier 6-8: open-composition — FreeWriting fallback
-  story_beginning: FreeWriting,
-  story_middle: FreeWriting,
-  story_ending: FreeWriting,
-  bme_plan: FreeWriting,
-  first_complete_story: FreeWriting,
-  when_starter: FreeWriting,
-  although_starter: FreeWriting,
-  sentence_variety: FreeWriting,
-  detailed_opening: FreeWriting,
-  narrative_showcase: FreeWriting,
+  // Tier 6 — Beginning / Middle / End story planner
+  story_beginning: StoryPlanner,
+  story_middle: StoryPlanner,
+  story_ending: StoryPlanner,
+  bme_plan: StoryPlanner,
+  first_complete_story: StoryPlanner,
+
+  // Tier 7 — Forced sentence starters + variety mixing
+  when_starter: SentenceStarter,
+  although_starter: SentenceStarter,
+  sentence_variety: SentenceVariety,
+
+  // Tier 8 — Showcase narrative
+  detailed_opening: ShowcaseNarrative,
+  narrative_showcase: ShowcaseNarrative,
 }
 
 export function getActivityComponent(type: ActivityType): ActivityComponent {
