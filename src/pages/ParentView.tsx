@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 import AddPupilForm from '@/components/dashboard/AddPupilForm'
 import CredentialsCard from '@/components/dashboard/CredentialsCard'
 import { useHomeAccount } from '@/hooks/useHomeAccount'
@@ -50,10 +51,13 @@ export default function ParentView() {
   return (
     <main className="min-h-screen bg-surface-pupil pb-12">
       <header className="bg-brand-primary text-white px-5 py-4 rounded-b-pwp-banner">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-pwp-xs opacity-75 font-bold uppercase tracking-wide">Parent dashboard</p>
-            <h1 className="text-pwp-lg font-extrabold">Hi {account.display_name.split(' ')[0]}!</h1>
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <HomeNav />
+            <div>
+              <p className="text-pwp-xs opacity-75 font-bold uppercase tracking-wide">Parent dashboard</p>
+              <h1 className="text-pwp-lg font-extrabold">Hi {account.display_name.split(' ')[0]}!</h1>
+            </div>
           </div>
           <button onClick={() => supabase.auth.signOut().then(() => location.assign('/'))} className="text-pwp-xs font-bold opacity-80 hover:opacity-100 underline">
             Sign out

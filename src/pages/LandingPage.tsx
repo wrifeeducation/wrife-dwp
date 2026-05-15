@@ -14,10 +14,11 @@ export default function LandingPage() {
     <main className="min-h-screen bg-surface-pupil">
       {/* 1. Sticky purple nav */}
       <nav className="sticky top-0 z-10 bg-brand-primary text-white px-5 h-[52px] flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <img src="/mascots/mascot_std_11.png" alt="" width={32} height={32} className="rounded-full" />
           <span className="text-pwp-md font-extrabold">WriFe</span>
           <span className="text-pwp-xs opacity-75 hidden sm:inline">Daily Writing Practice</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-2">
           <Link to="/account/login" className="text-pwp-xs font-bold px-3 py-1.5 rounded-pwp-pill border border-white/60 hover:bg-white/10">
             Log in
@@ -44,10 +45,10 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="relative justify-self-center">
-            <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-brand-primary/10 grid place-items-center">
-              <Mascot mood="excited" size={108} />
+            <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-brand-primary/10 grid place-items-center overflow-hidden">
+              <Mascot pose="welcome" size={180} />
             </div>
-            <span className="absolute bottom-1 right-1 w-9 h-9 bg-brand-secondary rounded-full grid place-items-center text-white text-xl" style={{ borderBottom: '3px solid #c47a0a' }}>
+            <span className="absolute bottom-2 right-2 w-10 h-10 bg-brand-secondary rounded-full grid place-items-center text-white text-xl" style={{ borderBottom: '3px solid #c47a0a' }}>
               ⭐
             </span>
           </div>

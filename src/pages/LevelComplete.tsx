@@ -24,7 +24,7 @@ export default function LevelComplete() {
         className="text-center max-w-md"
       >
         <div className="flex justify-center mb-4">
-          <Mascot mood="excited" size={120} />
+          <Mascot pose={result?.band === 'mastery' ? 'badge_mastery' : 'celebrate'} size={140} />
         </div>
         <h1 className="text-pwp-2xl font-extrabold text-brand-primary mb-2">
           {result?.band === 'mastery' ? 'Mastery!' : 'Level passed!'}

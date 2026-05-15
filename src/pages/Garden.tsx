@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 import MeadowBiome from '@/components/garden/MeadowBiome'
 import { useGarden } from '@/hooks/useGarden'
 import { BIOMES } from '@/lib/garden/biomes'
@@ -19,6 +20,7 @@ export default function Garden() {
         <div className="flex justify-between items-center mb-2">
           <Link to="/" className="bg-white/15 text-white/90 text-pwp-xs font-bold px-3 py-1.5 rounded-pwp-pill">← Path</Link>
           <BackToWriFe />
+          <HomeNav />
         </div>
         <h1 className="text-pwp-xl font-extrabold">Your Enchanted Story Garden</h1>
         <p className="text-white/70 text-pwp-sm mt-1">Plant the words you've earned and watch your garden grow.</p>

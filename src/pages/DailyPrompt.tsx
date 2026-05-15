@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 import OralRehearsalPanel from '@/components/audio/OralRehearsalPanel'
 import TTSPlayer from '@/components/audio/TTSPlayer'
 import FreeWriting from '@/components/activity/FreeWriting'
@@ -32,9 +33,10 @@ export default function DailyPrompt() {
         <header className="bg-mode-paragraph text-white px-5 py-5 rounded-b-pwp-banner flex justify-between items-center">
           <Link to="/" className="bg-white/15 text-white/90 text-pwp-xs font-bold px-3 py-1.5 rounded-pwp-pill">← Path</Link>
           <BackToWriFe />
+          <HomeNav />
         </header>
         <section className="p-6 text-center max-w-md mx-auto">
-          <p className="text-6xl mb-3">✅</p>
+          <div className="flex justify-center mb-3"><img src="/mascots/mascot_std_3.png" alt="" width={140} height={140} /></div>
           <h1 className="text-pwp-xl font-extrabold text-mode-paragraph mb-2">Today's prompt done!</h1>
           <p className="text-pwp-base text-neutral-600 mb-5">Come back tomorrow for another. In the meantime, keep going on your path or visit your Garden.</p>
           <Link to="/" className="btn-wrife-cta btn-wrife-cta--correct inline-block">Back to your path</Link>
@@ -93,6 +95,7 @@ export default function DailyPrompt() {
         <div className="flex justify-between items-center mb-2">
           <Link to="/" className="bg-white/15 text-white/90 text-pwp-xs font-bold px-3 py-1.5 rounded-pwp-pill">← Path</Link>
           <BackToWriFe />
+          <HomeNav />
         </div>
         <span className="inline-block bg-white/15 text-white/85 text-pwp-xs font-extrabold uppercase tracking-wide px-3 py-1 rounded-pwp-pill mb-2">
           Today · {prompt.category}

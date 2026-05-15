@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Band } from '@/types/dwp'
+import type { MascotPose } from '@/components/shell/Mascot'
+import Mascot from '@/components/shell/Mascot'
 
 interface Props {
   open: boolean
@@ -11,11 +13,11 @@ interface Props {
   onContinue: () => void
 }
 
-const PALETTE: Record<Band, { bg: string; ctaText: string; icon: string }> = {
-  mastery:    { bg: '#00b894',                ctaText: '#007d67', icon: '🏆' },
-  secure:     { bg: '#00b894',                ctaText: '#007d67', icon: '⭐' },
-  developing: { bg: '#F5A623',                ctaText: '#c47a0a', icon: '💪' },
-  emerging:   { bg: '#ffd9b8',                ctaText: '#c47a0a', icon: '🌱' },
+const PALETTE: Record<Band, { bg: string; ctaText: string; pose: MascotPose }> = {
+  mastery:    { bg: '#00b894',                ctaText: '#007d67', pose: 'celebrate' },
+  secure:     { bg: '#00b894',                ctaText: '#007d67', pose: 'thumbs_up' },
+  developing: { bg: '#F5A623',                ctaText: '#c47a0a', pose: 'thinking' },
+  emerging:   { bg: '#ffd9b8',                ctaText: '#c47a0a', pose: 'worried' },
 }
 
 /**
@@ -39,7 +41,7 @@ export default function FeedbackPanel({ open, band, heading, message, xp, ctaLab
           aria-live="polite"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span aria-hidden="true" className="text-2xl">{c.icon}</span>
+            <Mascot pose={c.pose} size={48} className="bg-white/15 rounded-full p-1 flex-shrink-0" />
             <div className="flex-1">
               <div className="text-pwp-md font-extrabold">{heading}</div>
               <div className="text-pwp-sm opacity-90">{message}</div>

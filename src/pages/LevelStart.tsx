@@ -1,5 +1,6 @@
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 import Mascot from '@/components/shell/Mascot'
 import { useLevel } from '@/hooks/useLevel'
 import { TIER_TITLES } from '@/lib/progress/levels'
@@ -25,6 +26,7 @@ export default function LevelStart() {
             ← Path
           </Link>
           <BackToWriFe />
+          <HomeNav />
         </div>
         <span className="inline-block bg-white/15 text-white/85 text-pwp-xs font-extrabold uppercase tracking-wide px-3 py-1 rounded-pwp-pill mb-2">
           Tier {level.tier_number} · Level {level.level_number}
@@ -35,7 +37,7 @@ export default function LevelStart() {
 
       {/* Mascot + objective */}
       <section className="px-5 py-5 flex gap-4 items-start bg-white">
-        <Mascot mood="welcome" size={72} />
+        <Mascot pose="reading" size={96} />
         <div>
           <p className="text-pwp-base font-bold text-neutral-800">{level.prompt_title}</p>
           <p className="text-pwp-sm text-neutral-600 mt-1.5">{level.prompt_instructions}</p>

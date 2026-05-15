@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 import StatsChips from '@/components/dashboard/StatsChips'
 import UnitBanner from '@/components/dashboard/UnitBanner'
 import PathNode from '@/components/dashboard/PathNode'
@@ -30,6 +31,7 @@ export default function Dashboard() {
       <header className="bg-brand-primary text-white px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <BackToWriFe />
+          <HomeNav />
           <span className="font-extrabold text-pwp-md">WriFe World</span>
         </div>
         <StatsChips

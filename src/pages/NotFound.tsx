@@ -1,4 +1,5 @@
 import BackToWriFe from '@/components/shell/BackToWriFe'
+import HomeNav from '@/components/shell/HomeNav'
 
 /**
  * Page not found
@@ -14,6 +15,7 @@ export default function NotFound() {
       <header className="bg-brand-primary text-white p-4 rounded-b-pwp-banner">
         <div className="flex justify-between items-center mb-2">
           <BackToWriFe />
+          <HomeNav />
           <span className="text-pwp-xs font-bold opacity-70">DWP scaffold</span>
         </div>
         <h1 className="text-pwp-xl font-extrabold">Page not found</h1>

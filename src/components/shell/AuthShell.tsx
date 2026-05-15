@@ -22,8 +22,13 @@ export default function AuthShell({ title, subtitle, mood = 'welcome', children,
     <main className="min-h-screen bg-surface-pupil flex flex-col">
       <header className="bg-brand-primary text-white px-5 py-4 rounded-b-pwp-banner">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <span className="text-pwp-md font-extrabold">WriFe Daily Writing</span>
-          <Link to="/" className="text-pwp-xs font-bold opacity-80 hover:opacity-100">Help</Link>
+          <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <img src="/mascots/mascot_std_11.png" alt="" width={32} height={32} className="rounded-full" />
+            <span className="text-pwp-md font-extrabold">WriFe Daily Writing</span>
+          </Link>
+          <Link to="/" className="text-pwp-xs font-bold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-pwp-pill transition-colors">
+            ← Home
+          </Link>
         </div>
       </header>
 
