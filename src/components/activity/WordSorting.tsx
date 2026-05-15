@@ -4,17 +4,24 @@ import type { ActivityProps } from './types'
 interface SortItem { id: string; words: string[] }
 
 type Category = 'people' | 'places' | 'things' | 'actions'
-const CATEGORY_LABELS: Record<Category, string> = {
-  people: '👥 People',
-  places: '🏠 Places',
-  things: '🎾 Things',
-  actions: '⚡ Actions',
+interface CatMeta { label: string; emoji: string; bg: string; bgDark: string }
+
+const CATEGORY_META: Record<Category, CatMeta> = {
+  people:  { label: 'People',  emoji: '👥', bg: '#74B9FF', bgDark: '#0d3f7a' },
+  places:  { label: 'Places',  emoji: '🏠', bg: '#A29BFE', bgDark: '#3d35a0' },
+  things:  { label: 'Things',  emoji: '🎾', bg: '#55EFC4', bgDark: '#007d67' },
+  actions: { label: 'Actions', emoji: '⚡', bg: '#FD79A8', bgDark: '#880e4f' },
 }
 
 /**
- * L1 / L5 — pupils sort words into 3 or 4 noun-class columns.
- * UI: tap a word → tap a column. Tapped words highlight; unsorted remain in
- * the pool. Submit becomes active once all words are placed.
+ * L1 / L5 — sort words into 3 or 4 noun-class columns.
+ *
+ * Early-years friendly:
+ *  - Big saturated category tiles (white emoji + label on coloured background)
+ *  - Big chunky word chips (16-18px font, 48-56px tall, white bg until selected,
+ *    full-colour fill when selected)
+ *  - Generous spacing
+ *  - The "Pick a word, then tap a column" instruction sits on a pale-purple shelf
  */
 export default function WordSorting({ level, onSubmit, submitting }: ActivityProps) {
   const items = (level.items as SortItem[])[0]
@@ -36,54 +43,83 @@ export default function WordSorting({ level, onSubmit, submitting }: ActivityPro
   const allPlaced = unsorted.length === 0
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-pwp-sm font-extrabold text-neutral-500 uppercase tracking-wide text-center">
-        Pick a word, then tap a column
-      </p>
-
-      {/* Word pool */}
-      <div className="flex flex-wrap gap-2 justify-center bg-surface-practice-bg rounded-pwp-tile p-3 min-h-[64px]">
-        {unsorted.map((w) => (
-          <button
-            key={w}
-            onClick={() => setSelected(w === selected ? null : w)}
-            className="px-3 py-1.5 rounded-pwp-tile font-bold text-pwp-sm transition-colors"
-            style={{
-              background: selected === w ? 'var(--color-brand-primary)' : 'white',
-              color: selected === w ? 'white' : '#333',
-              border: selected === w ? '2px solid var(--color-brand-primary)' : '2px solid #ddd',
-              borderBottom: selected === w ? '3px solid #3d35a0' : '3px solid #ccc',
-              minHeight: 'var(--pwp-touch-min)',
-            }}
-          >
-            {w}
-          </button>
-        ))}
-        {unsorted.length === 0 && (
-          <span className="text-pwp-sm text-mode-correct font-bold">All sorted! ✓</span>
-        )}
+    <div className="flex flex-col gap-5">
+      {/* Instruction shelf */}
+      <div className="bg-surface-practice-bg rounded-pwp-tile px-4 py-3 text-center">
+        <p className="text-pwp-sm font-extrabold text-brand-primary uppercase tracking-wide">
+          {selected ? `Now tap a column for "${selected}"` : 'Pick a word, then tap a column'}
+        </p>
       </div>
 
-      {/* Category columns */}
-      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
+      {/* Word pool — big chunky chips */}
+      <div className="bg-white rounded-pwp-banner p-4 min-h-[88px] border-2 border-brand-primary/15">
+        <div className="flex flex-wrap gap-2 justify-center items-center">
+          {unsorted.length === 0 ? (
+            <span className="text-pwp-md font-extrabold text-mode-correct">All sorted! ✓</span>
+          ) : (
+            unsorted.map((w) => {
+              const isSelected = selected === w
+              return (
+                <button
+                  key={w}
+                  onClick={() => setSelected(w === selected ? null : w)}
+                  className="px-4 py-2.5 rounded-pwp-tile font-extrabold transition-all"
+                  style={{
+                    background: isSelected ? 'var(--color-brand-primary)' : 'white',
+                    color: isSelected ? 'white' : '#333',
+                    border: '3px solid #ddd',
+                    borderColor: isSelected ? 'var(--color-brand-primary)' : '#ddd',
+                    borderBottom: isSelected ? '4px solid #3d35a0' : '4px solid #ccc',
+                    minHeight: 'var(--pwp-touch)',
+                    fontSize: 'var(--pwp-text-md)',
+                    transform: isSelected ? 'translateY(-2px)' : 'none',
+                  }}
+                >
+                  {w}
+                </button>
+              )
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Category drop columns — big saturated cards */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
         {categories.map((cat) => {
+          const meta = CATEGORY_META[cat]
           const placed = Object.entries(placements).filter(([, c]) => c === cat).map(([w]) => w)
+          const armed = !!selected
           return (
             <button
               key={cat}
               onClick={() => place(cat)}
               disabled={!selected}
-              className="rounded-pwp-tile p-3 text-center border-2 disabled:opacity-60 transition-colors"
+              className="rounded-pwp-banner overflow-hidden text-left disabled:opacity-60 transition-transform"
               style={{
-                background: selected ? '#f5f3ff' : '#fafafa',
-                borderColor: selected ? 'var(--color-brand-primary)' : '#e5e5e5',
+                background: 'white',
+                border: `3px solid ${meta.bg}`,
+                borderBottom: `5px solid ${meta.bgDark}`,
+                boxShadow: armed ? `0 6px 16px ${meta.bg}55` : 'none',
+                transform: armed ? 'translateY(-1px)' : 'none',
               }}
             >
-              <div className="text-pwp-xs font-extrabold mb-2">{CATEGORY_LABELS[cat]}</div>
-              <div className="flex flex-col gap-1 min-h-[60px]">
-                {placed.map((w) => (
-                  <span key={w} className="text-pwp-xs bg-white rounded px-2 py-1">{w}</span>
-                ))}
+              {/* Header */}
+              <div className="px-3 py-3 text-center" style={{ background: meta.bg, color: 'white' }}>
+                <div className="text-2xl leading-none" aria-hidden="true">{meta.emoji}</div>
+                <div className="text-pwp-md font-extrabold mt-1">{meta.label}</div>
+              </div>
+              {/* Drop area */}
+              <div className="px-2 py-3 flex flex-col gap-1.5 min-h-[100px] bg-white">
+                {placed.length === 0 ? (
+                  <span className="text-pwp-xs text-neutral-400 text-center italic">tap to place</span>
+                ) : (
+                  placed.map((w) => (
+                    <span key={w} className="text-pwp-base font-extrabold text-center rounded-pwp-tile py-1.5 px-2"
+                          style={{ background: meta.bg + '20', color: meta.bgDark }}>
+                      {w}
+                    </span>
+                  ))
+                )}
               </div>
             </button>
           )
@@ -95,7 +131,7 @@ export default function WordSorting({ level, onSubmit, submitting }: ActivityPro
         disabled={!allPlaced || submitting}
         className="btn-wrife-cta btn-wrife-cta--primary mt-2"
       >
-        {submitting ? 'Checking…' : 'Check my sorting'}
+        {submitting ? 'Checking…' : 'Check my sorting →'}
       </button>
     </div>
   )

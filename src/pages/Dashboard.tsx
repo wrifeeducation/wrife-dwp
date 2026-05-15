@@ -59,10 +59,19 @@ export default function Dashboard() {
             <HomeNav />
             <span className="font-extrabold text-pwp-md hidden sm:inline">WriFe World</span>
           </div>
-          <StatsChips
-            streak={progress?.current_streak_days ?? 0}
-            xp={progress?.xp_total ?? 0}
-          />
+          <div className="flex items-center gap-2">
+            <StatsChips
+              streak={progress?.current_streak_days ?? 0}
+              xp={progress?.xp_total ?? 0}
+            />
+            <button
+              onClick={() => supabase.auth.signOut().then(() => location.assign('/'))}
+              className="text-pwp-xs font-bold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-pwp-pill"
+              aria-label="Sign out"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 

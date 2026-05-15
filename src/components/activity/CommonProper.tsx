@@ -3,50 +3,48 @@ import type { ActivityProps } from './types'
 
 interface CPItem { word: string; type: 'common' | 'proper' }
 
-/**
- * L4 — Decide whether each word is a common noun or a proper noun.
- * Proper-noun pick capitalises the displayed word as a visual reinforcement.
- */
 export default function CommonProper({ level, onSubmit, submitting }: ActivityProps) {
   const items = (level.items as CPItem[]) ?? []
   const [picks, setPicks] = useState<Record<number, 'common' | 'proper'>>({})
-
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-pwp-sm font-extrabold text-neutral-500 uppercase tracking-wide text-center">
-        Is each word common or proper?
-      </p>
+    <div className="flex flex-col gap-4">
+      <div className="bg-surface-practice-bg rounded-pwp-tile px-4 py-3 text-center">
+        <p className="text-pwp-sm font-extrabold text-brand-primary uppercase tracking-wide">
+          Common (general) or Proper (specific name)?
+        </p>
+      </div>
       {items.map((it, i) => {
         const pick = picks[i]
-        const displayWord = pick === 'proper' ? it.word.charAt(0).toUpperCase() + it.word.slice(1) : it.word
+        const display = pick === 'proper' ? it.word.charAt(0).toUpperCase() + it.word.slice(1) : it.word
         return (
-          <div key={i} className="bg-surface-practice-bg rounded-pwp-tile p-3 flex items-center justify-between gap-3">
-            <span className="text-pwp-md font-bold text-neutral-900">{displayWord}</span>
+          <div key={i} className="bg-white rounded-pwp-banner p-4 border-2 border-brand-primary/15 flex items-center justify-between gap-3">
+            <span className="text-pwp-xl font-extrabold text-neutral-900">{display}</span>
             <div className="flex gap-2">
-              <PickButton label="common"  selected={pick === 'common'} colour="#1565c0" onClick={() => setPicks((p) => ({ ...p, [i]: 'common' }))} />
-              <PickButton label="proper" selected={pick === 'proper'} colour="#4a40b8" onClick={() => setPicks((p) => ({ ...p, [i]: 'proper' }))} />
+              <Pill label="Common" selected={pick === 'common'} fill="#74B9FF" fillDark="#0d3f7a" onClick={() => setPicks((p) => ({ ...p, [i]: 'common' }))} />
+              <Pill label="Proper" selected={pick === 'proper'} fill="#A29BFE" fillDark="#3d35a0" onClick={() => setPicks((p) => ({ ...p, [i]: 'proper' }))} />
             </div>
           </div>
         )
       })}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
-        {submitting ? 'Checking…' : 'Check my answers'}
+      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
+        {submitting ? 'Checking…' : 'Check my answers →'}
       </button>
     </div>
   )
 }
 
-function PickButton({ label, selected, colour, onClick }: { label: string; selected: boolean; colour: string; onClick: () => void }) {
+function Pill({ label, selected, fill, fillDark, onClick }: { label: string; selected: boolean; fill: string; fillDark: string; onClick: () => void }) {
   return (
     <button onClick={onClick} aria-pressed={selected}
-      className="px-3 py-1.5 rounded-pwp-tile font-extrabold text-pwp-xs uppercase tracking-wide transition-colors min-h-[var(--pwp-touch-min)]"
+      className="rounded-pwp-tile font-extrabold uppercase tracking-wide transition-all"
       style={{
-        background: selected ? colour : 'white',
-        color: selected ? 'white' : colour,
-        border: `2px solid ${colour}`,
-        borderBottom: `3px solid ${colour}`,
+        background: selected ? fill : 'white',
+        color: selected ? 'white' : fill,
+        border: `3px solid ${fill}`, borderBottom: `4px solid ${fillDark}`,
+        padding: '10px 16px', fontSize: 'var(--pwp-text-sm)', minHeight: 'var(--pwp-touch)',
+        transform: selected ? 'translateY(-2px)' : 'none',
       }}>
       {label}
     </button>

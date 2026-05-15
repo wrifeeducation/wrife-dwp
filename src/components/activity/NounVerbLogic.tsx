@@ -3,47 +3,47 @@ import type { ActivityProps } from './types'
 
 interface LogicItem { pair: string; answer: 'yes' | 'no' }
 
-/**
- * L3 — Does this word-pair make sense?
- * Tap YES or NO. Selecting one locks the answer.
- */
 export default function NounVerbLogic({ level, onSubmit, submitting }: ActivityProps) {
   const items = (level.items as LogicItem[]) ?? []
   const [picks, setPicks] = useState<Record<number, 'yes' | 'no'>>({})
-
   const allAnswered = items.length > 0 && items.every((_, i) => picks[i])
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-pwp-sm font-extrabold text-neutral-500 uppercase tracking-wide text-center">
-        Does each pair make sense?
-      </p>
+    <div className="flex flex-col gap-4">
+      <div className="bg-surface-practice-bg rounded-pwp-tile px-4 py-3 text-center">
+        <p className="text-pwp-sm font-extrabold text-brand-primary uppercase tracking-wide">
+          Does each pair make sense?
+        </p>
+      </div>
       {items.map((it, i) => (
-        <div key={i} className="bg-surface-practice-bg rounded-pwp-tile p-3 flex items-center justify-between gap-3">
-          <span className="text-pwp-base font-bold text-neutral-900">{it.pair}</span>
+        <div key={i} className="bg-white rounded-pwp-banner p-4 border-2 border-brand-primary/15 flex items-center justify-between gap-3">
+          <span className="text-pwp-lg font-extrabold text-neutral-900">{it.pair}</span>
           <div className="flex gap-2">
-            <YesNoButton selected={picks[i] === 'yes'} variant="yes" onClick={() => setPicks((p) => ({ ...p, [i]: 'yes' }))} />
-            <YesNoButton selected={picks[i] === 'no'} variant="no"  onClick={() => setPicks((p) => ({ ...p, [i]: 'no'  }))} />
+            <PickPill selected={picks[i] === 'yes'} variant="yes" onClick={() => setPicks((p) => ({ ...p, [i]: 'yes' }))} />
+            <PickPill selected={picks[i] === 'no'} variant="no"  onClick={() => setPicks((p) => ({ ...p, [i]: 'no'  }))} />
           </div>
         </div>
       ))}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
-        {submitting ? 'Checking…' : 'Check my answers'}
+      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
+        {submitting ? 'Checking…' : 'Check my answers →'}
       </button>
     </div>
   )
 }
 
-function YesNoButton({ selected, variant, onClick }: { selected: boolean; variant: 'yes' | 'no'; onClick: () => void }) {
+function PickPill({ selected, variant, onClick }: { selected: boolean; variant: 'yes' | 'no'; onClick: () => void }) {
   const isYes = variant === 'yes'
+  const fill = isYes ? '#00b894' : '#E17055'
+  const fillDark = isYes ? '#007d67' : '#8d2828'
   return (
     <button onClick={onClick} aria-pressed={selected}
-      className="px-4 py-1.5 rounded-pwp-tile font-extrabold text-pwp-sm transition-colors min-h-[var(--pwp-touch-min)]"
+      className="rounded-pwp-tile font-extrabold uppercase tracking-wide transition-all"
       style={{
-        background: selected ? (isYes ? '#00b894' : '#F5A623') : 'white',
-        color: selected ? 'white' : isYes ? '#00b894' : '#c47a0a',
-        border: `2px solid ${isYes ? '#00b894' : '#F5A623'}`,
-        borderBottom: `3px solid ${isYes ? '#007d67' : '#c47a0a'}`,
+        background: selected ? fill : 'white',
+        color: selected ? 'white' : fill,
+        border: `3px solid ${fill}`, borderBottom: `4px solid ${fillDark}`,
+        padding: '10px 18px', fontSize: 'var(--pwp-text-md)', minHeight: 'var(--pwp-touch)',
+        transform: selected ? 'translateY(-2px)' : 'none',
       }}>
       {isYes ? '✓ Yes' : '✗ No'}
     </button>
