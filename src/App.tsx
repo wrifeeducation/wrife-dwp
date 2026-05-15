@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { detectHubEntry } from '@/lib/auth/hubEntry'
 import Dashboard from '@/pages/Dashboard'
+import Home from '@/pages/Home'
 import LevelStart from '@/pages/LevelStart'
 import StepPractice from '@/pages/StepPractice'
 import LevelComplete from '@/pages/LevelComplete'
@@ -36,7 +37,8 @@ export default function App() {
   return (
     <Routes>
       {/* Pupil routes */}
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/level/:levelId" element={<LevelStart />} />
       <Route path="/level/:levelId/practice" element={<StepPractice />} />
       <Route path="/level/:levelId/complete" element={<LevelComplete />} />

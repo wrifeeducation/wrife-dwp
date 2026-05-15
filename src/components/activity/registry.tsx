@@ -5,6 +5,10 @@ import FreeWriting from './FreeWriting'
 import VerbIdentification from './VerbIdentification'
 import NounVerbLogic from './NounVerbLogic'
 import CommonProper from './CommonProper'
+import WordCompletion from './WordCompletion'
+import FormulaBuilder from './FormulaBuilder'
+import SentenceJoin from './SentenceJoin'
+import SentenceOrdering from './SentenceOrdering'
 
 type ActivityComponent = React.ComponentType<{
   level: DwpLevel
@@ -13,36 +17,63 @@ type ActivityComponent = React.ComponentType<{
 }>
 
 /**
- * Maps activity_type → the React component that renders the practice UI.
+ * Maps activity_type → React component for the practice UI.
  *
- * Phase 3 ships three live variants (word_sorting, sentence_fix, free_writing).
- * Most other activity types fall through to FreeWriting as a sensible default
- * while individual variants are built out in subsequent phases.
- *
- * - Tiers 1 (word sorting + mixed) → WordSorting
- * - L12 (sentence_fix) → SentenceFix
- * - Everything else → FreeWriting (catches L14, L24, L28, L33, L40, etc.)
+ * Bespoke variants cover Tiers 1-5 (the levels with structured items). Tiers
+ * 6-8 (story_beginning, bme_plan, narrative_showcase, etc.) intentionally
+ * fall through to FreeWriting — those are open-composition tasks where the
+ * pupil writes prose into a textarea.
  */
 const REGISTRY: Partial<Record<ActivityType, ActivityComponent>> = {
+  // Tier 1
   word_sorting: WordSorting,
   mixed_sorting: WordSorting,
   verb_identification: VerbIdentification,
   noun_verb_logic: NounVerbLogic,
   proper_noun_capitalisation: CommonProper,
-  sentence_fix: SentenceFix,
+
+  // Tier 2
+  add_noun: WordCompletion,
+  add_verb: WordCompletion,
+  add_adjective: WordCompletion,
+  det_noun_verb: FormulaBuilder,
+  word_chain: FormulaBuilder,
+
+  // Tier 3
   sentence_copy: SentenceFix,
-  // Free-writing fallback covers all open-text activities (Tier 3+):
+  sentence_fix: SentenceFix,
+  sentence_completion: WordCompletion,
+  add_where: WordCompletion,
+  add_when: WordCompletion,
+  who_what_where: FormulaBuilder,
   independent_milestone: FreeWriting,
-  formula_sentence: FreeWriting,
-  three_connected: FreeWriting,
+
+  // Tier 4
+  enhance_adjectives: WordCompletion,
+  join_and: SentenceJoin,
+  use_but: SentenceJoin,
+  because_clauses: SentenceJoin,
+  when_time: SentenceJoin,
+  multiple_details: FormulaBuilder,
+  formula_sentence: FormulaBuilder,
+
+  // Tier 5
+  temporal_connectives: SentenceOrdering,
+  three_connected: SentenceOrdering,
+  before_after: SentenceOrdering,
   five_sentence_recount: FreeWriting,
+
+  // Tier 6-8: open-composition — FreeWriting fallback
+  story_beginning: FreeWriting,
+  story_middle: FreeWriting,
+  story_ending: FreeWriting,
   bme_plan: FreeWriting,
   first_complete_story: FreeWriting,
+  when_starter: FreeWriting,
+  although_starter: FreeWriting,
+  sentence_variety: FreeWriting,
   detailed_opening: FreeWriting,
   narrative_showcase: FreeWriting,
-  sentence_variety: FreeWriting,
-  // ... the remaining 27 are intentionally registered against FreeWriting in
-  // Phase 3 and progressively replaced with bespoke variants in later phases.
 }
 
 export function getActivityComponent(type: ActivityType): ActivityComponent {
