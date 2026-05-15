@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────
+ * WriFe World — runtime CSS variables for things Tailwind can't express
+ * (font fluid tokens echoed here for use outside Tailwind className).
+ * Pupil-facing surfaces NEVER use cream #FDF8EE — that's adult-only.
+ * ─────────────────────────────────────────────────────────────────── */
+:root {
+  --color-brand-primary: #6C5CE7;
+  --color-brand-primary-dark: #3d35a0;
+  --color-brand-secondary: #F5A623;
+  --color-brand-secondary-dark: #c47a0a;
+  --color-mode-correct: #00b894;
+  --color-mode-correct-dark: #007d67;
+
+  --pwp-text-xs:   clamp(0.75rem, 0.7rem + 0.2vw, 0.85rem);
+  --pwp-text-sm:   clamp(0.85rem, 0.8rem + 0.25vw, 0.95rem);
+  --pwp-text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --pwp-text-md:   clamp(1.125rem, 1.05rem + 0.4vw, 1.25rem);
+  --pwp-text-lg:   clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --pwp-text-xl:   clamp(1.5rem, 1.3rem + 1vw, 1.75rem);
+  --pwp-text-2xl:  clamp(1.75rem, 1.5rem + 1.25vw, 2.25rem);
+
+  --pwp-touch-min: 44px;
+  --pwp-touch:     52px;
+  --pwp-touch-xl:  60px;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #ffffff; /* pupil-facing default — NOT cream */
+  color: #1a1a1a;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Pattern 2 — Chunky bottom-border CTA button
+ * Use via @apply or class composition. Provides the "press" feel.
+ * ─────────────────────────────────────────────────────────────────── */
+.btn-wrife-cta {
+  width: 100%;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 14px;
+  font-size: var(--pwp-text-base);
+  font-weight: 800;
+  color: white;
+  background: var(--color-brand-secondary);
+  border-bottom: 4px solid var(--color-brand-secondary-dark);
+  min-height: var(--pwp-touch-xl);
+  cursor: pointer;
+  transition: transform 0.05s, border-bottom-width 0.05s;
+}
+.btn-wrife-cta:active {
+  border-bottom-width: 1px;
+  transform: translateY(2px);
+}
+.btn-wrife-cta.btn-wrife-cta--primary {
+  background: var(--color-brand-primary);
+  border-bottom-color: var(--color-brand-primary-dark);
+}
+.btn-wrife-cta.btn-wrife-cta--correct {
+  background: var(--color-mode-correct);
+  border-bottom-color: var(--color-mode-correct-dark);
+}
+.btn-wrife-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

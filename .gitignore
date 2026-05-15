@@ -1,0 +1,43 @@
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# build output
+dist
+dist-ssr
+*.local
+.vite
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# node
+node_modules
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# supabase
+.supabase
+supabase/.branches
+supabase/.temp
+
+# audio cache (pre-generated MP3s live in Supabase Storage in prod)
+public/audio/*
+!public/audio/.gitkeep
