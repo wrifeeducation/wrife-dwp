@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLevel } from '@/hooks/useLevel'
 import { getActivityComponent } from '@/components/activity/registry'
 import FeedbackPanel from '@/components/feedback/FeedbackPanel'
+import TTSPlayer from '@/components/audio/TTSPlayer'
+import { levelIntroUrl } from '@/lib/audio/tts'
 import { submitAttempt, type AssessmentResult } from '@/lib/claude/assess'
 import type { Band } from '@/types/dwp'
 
@@ -64,16 +66,17 @@ export default function StepPractice() {
 
   return (
     <main className="min-h-screen bg-surface-pupil pb-32">
-      {/* Slim progress strip */}
-      <header className="px-4 pt-3 pb-2 border-b border-neutral-100">
-        <div className="flex items-center gap-3 mb-1">
-          <button onClick={() => nav(`/level/${level.level_id}`)} aria-label="Quit level" className="text-brand-primary text-pwp-md">×</button>
-          <div className="flex-1 h-2.5 bg-brand-primary/15 rounded-full overflow-hidden">
-            <div className="h-full bg-brand-primary rounded-full" style={{ width: '33%' }} />
-          </div>
+      {/* Top bar: quit, level label, Hear it, lives */}
+      <header className="px-4 pt-3 pb-3 border-b border-neutral-100">
+        <div className="flex items-center gap-3">
+          <button onClick={() => nav(`/level/${level.level_id}`)} aria-label="Quit level" className="text-brand-primary text-pwp-md font-extrabold">×</button>
+          <span className="text-pwp-xs font-extrabold text-neutral-500 uppercase tracking-wide">
+            Tier {level.tier_number} · Level {level.level_number}
+          </span>
+          <div className="flex-1" />
+          <TTSPlayer src={levelIntroUrl(level.level_id)} label="Hear it" size="sm" />
           <div className="flex gap-0.5 text-red-500" aria-label="lives">❤️❤️❤️</div>
         </div>
-        <p className="text-pwp-xs text-neutral-400 text-center">Step 1 of 3</p>
       </header>
 
       <section className="px-5 py-5">
