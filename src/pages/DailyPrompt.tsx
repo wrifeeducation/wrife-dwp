@@ -72,6 +72,7 @@ export default function DailyPrompt() {
   }
 
   async function handleSubmit(submission: unknown) {
+    if (!prompt) return
     setSubmitting(true)
     try {
       const r = await submitDailyPrompt({

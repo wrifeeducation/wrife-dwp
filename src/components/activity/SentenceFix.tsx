@@ -17,7 +17,7 @@ export default function SentenceFix({ level, onSubmit, submitting }: ActivityPro
       <p className="text-pwp-sm font-extrabold text-neutral-500 uppercase tracking-wide text-center">
         Add the missing capitals and full stops
       </p>
-      {items.map((it, i) => (
+      {items.map((_it, i) => (
         <label key={i} className="block">
           <span className="text-pwp-xs text-neutral-500 mb-1 block">Sentence {i + 1}</span>
           <input

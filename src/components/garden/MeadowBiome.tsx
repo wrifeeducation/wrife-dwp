@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
-import { MEADOW_PLANTS, plantForWord, type MeadowPlant } from '@/lib/garden/biomes'
+import { plantForWord, type MeadowPlant } from '@/lib/garden/biomes'
 
 interface PlantedSeed {
   id: string
   word: string
   growth_stage: 'sprout' | 'bloom' | 'mature'
-  planted_at: string
+  planted_at: string | null
 }
 
 interface Props {
