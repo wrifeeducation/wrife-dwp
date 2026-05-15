@@ -63,6 +63,7 @@ export default function Login() {
       bottomLinks={[
         { label: 'New family? Sign up →', to: '/home-signup' },
         { label: "Teacher? Sign up here →", to: '/teacher-signup' },
+        { label: 'Parent or teacher signing in? →', to: '/account/login' },
       ]}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -14,6 +14,7 @@ import ParentView from '@/pages/ParentView'
 import TeacherView from '@/pages/TeacherView'
 import NotFound from '@/pages/NotFound'
 import AuthConfirm from '@/pages/AuthConfirm'
+import AccountLogin from '@/pages/AccountLogin'
 
 /**
  * Root component for WriFe Daily Writing Practice.
@@ -53,6 +54,7 @@ export default function App() {
 
       {/* Auth confirmation landing page (email links) */}
       <Route path="/auth/confirm" element={<AuthConfirm />} />
+      <Route path="/account/login" element={<AccountLogin />} />
 
       {/* Fallback */}
       <Route path="/404" element={<NotFound />} />

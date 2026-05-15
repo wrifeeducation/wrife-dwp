@@ -2,6 +2,9 @@ import type { ActivityType, DwpLevel } from '@/types/dwp'
 import WordSorting from './WordSorting'
 import SentenceFix from './SentenceFix'
 import FreeWriting from './FreeWriting'
+import VerbIdentification from './VerbIdentification'
+import NounVerbLogic from './NounVerbLogic'
+import CommonProper from './CommonProper'
 
 type ActivityComponent = React.ComponentType<{
   level: DwpLevel
@@ -23,7 +26,9 @@ type ActivityComponent = React.ComponentType<{
 const REGISTRY: Partial<Record<ActivityType, ActivityComponent>> = {
   word_sorting: WordSorting,
   mixed_sorting: WordSorting,
-  proper_noun_capitalisation: WordSorting, // common/proper sorter — same UI shape
+  verb_identification: VerbIdentification,
+  noun_verb_logic: NounVerbLogic,
+  proper_noun_capitalisation: CommonProper,
   sentence_fix: SentenceFix,
   sentence_copy: SentenceFix,
   // Free-writing fallback covers all open-text activities (Tier 3+):

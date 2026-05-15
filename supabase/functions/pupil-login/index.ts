@@ -142,6 +142,14 @@ Deno.serve(async (req) => {
       return err(500, 'auth_signin_failed', signInErr?.message ?? 'sign-in failed')
     }
 
+
+    // Ensure a dwp_progress row exists for this pupil
+    await admin.from('dwp_progress').upsert({
+      pupil_id: pupil.id,
+      class_id: pupil.class_id,
+      current_level_id: 'dwp_l1',
+    }, { onConflict: 'pupil_id', ignoreDuplicates: true })
+
     return new Response(
       JSON.stringify({
         session: {

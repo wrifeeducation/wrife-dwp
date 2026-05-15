@@ -1,0 +1,1 @@
+{"root":["./vite.config.ts","./scripts/check-env.ts","./scripts/generate-audio.ts"],"version":"5.9.3"}

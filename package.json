@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "WriFe Daily Writing Practice \u2014 sub-app for the WriFe brand. dailywrite.wrife.co.uk",
+  "description": "WriFe Daily Writing Practice — sub-app for the WriFe brand. dailywrite.wrife.co.uk",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -21,6 +21,7 @@
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
+    "@types/node": "^20.19.41",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
@@ -33,7 +34,6 @@
     "tsx": "^4.19.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1",
-    "@types/node": "^20.14.0"
+    "vite": "^5.4.1"
   }
 }
