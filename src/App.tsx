@@ -13,6 +13,7 @@ import TeacherSignup from '@/pages/TeacherSignup'
 import ParentView from '@/pages/ParentView'
 import TeacherView from '@/pages/TeacherView'
 import NotFound from '@/pages/NotFound'
+import AuthConfirm from '@/pages/AuthConfirm'
 
 /**
  * Root component for WriFe Daily Writing Practice.
@@ -49,6 +50,9 @@ export default function App() {
       {/* Adult-facing routes */}
       <Route path="/parent" element={<ParentView />} />
       <Route path="/teacher" element={<TeacherView />} />
+
+      {/* Auth confirmation landing page (email links) */}
+      <Route path="/auth/confirm" element={<AuthConfirm />} />
 
       {/* Fallback */}
       <Route path="/404" element={<NotFound />} />

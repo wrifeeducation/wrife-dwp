@@ -1,28 +1,130 @@
-import BackToWriFe from '@/components/shell/BackToWriFe'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AuthShell from '@/components/shell/AuthShell'
+import ErrorBanner from '@/components/shell/ErrorBanner'
+import { pupilLogin, PupilLoginError } from '@/lib/auth/pupilLogin'
 
 /**
- * Sign in
+ * Route B — Pupil sign-in.
  *
- * Routes B/C/D entry. School pupils get redirected to wrife.co.uk — Phase 1 auth shell.
+ * Pupils enter the class_code their parent or teacher gave them, their
+ * username (lowercase nickname), and their 4-digit PIN. The combination is
+ * verified server-side by the pupil-login Edge Function which mints a real
+ * Supabase session.
  *
- * Placeholder during Phase 1 scaffolding. Real implementation lands in the
- * phase that owns this screen — see WriFe_DWP_Build_Plan_v1.md.
+ * Per wrife-brand-ecosystem rule, this page rejects school pupils — they
+ * must enter via wrife.co.uk. School pupils show up here as class rows whose
+ * account_type = 'school_shadow'; their direct-login attempt is rejected by
+ * the Edge Function (not implemented yet — school_shadow classes don't exist
+ * until the SSO bridge is built).
  */
 export default function Login() {
+  const nav = useNavigate()
+  const [classCode, setClassCode] = useState('')
+  const [username, setUsername] = useState('')
+  const [pin, setPin] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  function friendlyError(err: PupilLoginError): string {
+    switch (err.code) {
+      case 'invalid_credentials':
+        return 'That class code, username, or PIN doesn\'t match. Try again.'
+      case 'pin_invalid':
+        return 'PIN must be 4 digits.'
+      case 'missing_fields':
+        return 'Please fill in all three boxes.'
+      default:
+        return 'Something went wrong. Please try again in a moment.'
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      await pupilLogin({ classCode, username, pin })
+      nav('/', { replace: true })
+    } catch (err) {
+      if (err instanceof PupilLoginError) setError(friendlyError(err))
+      else setError('Something went wrong. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
-    <main className="min-h-screen bg-surface-pupil">
-      <header className="bg-brand-primary text-white p-4 rounded-b-pwp-banner">
-        <div className="flex justify-between items-center mb-2">
-          <BackToWriFe />
-          <span className="text-pwp-xs font-bold opacity-70">DWP scaffold</span>
-        </div>
-        <h1 className="text-pwp-xl font-extrabold">Sign in</h1>
-      </header>
-      <section className="p-6">
-        <p className="text-pwp-base text-neutral-600">
-          Routes B/C/D entry. School pupils get redirected to wrife.co.uk — Phase 1 auth shell.
-        </p>
-      </section>
-    </main>
+    <AuthShell
+      title="Hello again!"
+      subtitle="Sign in with your class code, username and PIN."
+      mood="welcome"
+      bottomLinks={[
+        { label: 'New family? Sign up →', to: '/home-signup' },
+        { label: "Teacher? Sign up here →", to: '/teacher-signup' },
+      ]}
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <ErrorBanner message={error} />
+
+        <label className="block">
+          <span className="text-pwp-xs font-extrabold text-neutral-700 uppercase tracking-wide mb-1.5 block">Class code</span>
+          <input
+            type="text"
+            inputMode="text"
+            autoCapitalize="characters"
+            autoComplete="off"
+            spellCheck={false}
+            value={classCode}
+            onChange={(e) => setClassCode(e.target.value.toUpperCase())}
+            maxLength={12}
+            required
+            className="w-full px-4 py-3 rounded-pwp-tile bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary focus:outline-none text-pwp-md font-extrabold tracking-widest text-center uppercase"
+            placeholder="ABC12345"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-pwp-xs font-extrabold text-neutral-700 uppercase tracking-wide mb-1.5 block">Your username</span>
+          <input
+            type="text"
+            inputMode="text"
+            autoCapitalize="none"
+            autoComplete="username"
+            spellCheck={false}
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
+            required
+            className="w-full px-4 py-3 rounded-pwp-tile bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary focus:outline-none text-pwp-base font-bold"
+            placeholder="amab04"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-pwp-xs font-extrabold text-neutral-700 uppercase tracking-wide mb-1.5 block">4-digit PIN</span>
+          <input
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="current-password"
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            maxLength={4}
+            required
+            className="w-full px-4 py-3 rounded-pwp-tile bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary focus:outline-none text-pwp-xl font-extrabold tracking-[0.5em] text-center"
+            placeholder="••••"
+          />
+        </label>
+
+        <button
+          type="submit"
+          disabled={submitting || classCode.length < 4 || !username || pin.length !== 4}
+          className="btn-wrife-cta mt-2"
+        >
+          {submitting ? 'Signing in…' : 'Start writing →'}
+        </button>
+      </form>
+    </AuthShell>
   )
 }
