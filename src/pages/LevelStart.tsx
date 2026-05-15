@@ -3,6 +3,8 @@ import BackToWriFe from '@/components/shell/BackToWriFe'
 import HomeNav from '@/components/shell/HomeNav'
 import Mascot from '@/components/shell/Mascot'
 import { useLevel } from '@/hooks/useLevel'
+import TTSPlayer from '@/components/audio/TTSPlayer'
+import { levelIntroUrl } from '@/lib/audio/tts'
 import { TIER_TITLES } from '@/lib/progress/levels'
 
 /**
@@ -35,12 +37,15 @@ export default function LevelStart() {
         <p className="text-white/70 text-pwp-sm mt-1">{TIER_TITLES[level.tier_number]}</p>
       </header>
 
-      {/* Mascot + objective */}
+      {/* Mascot + objective + audio */}
       <section className="px-5 py-5 flex gap-4 items-start bg-white">
         <Mascot pose="reading" size={96} />
-        <div>
-          <p className="text-pwp-base font-bold text-neutral-800">{level.prompt_title}</p>
-          <p className="text-pwp-sm text-neutral-600 mt-1.5">{level.prompt_instructions}</p>
+        <div className="flex-1">
+          <div className="flex items-start justify-between gap-3 mb-1.5">
+            <p className="text-pwp-base font-bold text-neutral-800">{level.prompt_title}</p>
+            <TTSPlayer src={levelIntroUrl(level.level_id)} label="Hear it" size="sm" />
+          </div>
+          <p className="text-pwp-sm text-neutral-600">{level.prompt_instructions}</p>
           {level.prompt_example && (
             <p className="text-pwp-sm text-neutral-500 mt-2 italic">e.g. {level.prompt_example}</p>
           )}
