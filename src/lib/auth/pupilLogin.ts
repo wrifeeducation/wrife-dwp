@@ -26,7 +26,7 @@ export class PupilLoginError extends Error {
  * run as the pupil's auth user.
  */
 export async function pupilLogin(args: { classCode: string; username: string; pin: string }): Promise<PupilSessionResult> {
-  const url = `${import.meta.env.VITE_DWP_SUPABASE_URL}/functions/v1/pupil-login`
+  const url = `${import.meta.env.VITE_DWP_SUPABASE_URL}/functions/v1/pupil-signin`
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
