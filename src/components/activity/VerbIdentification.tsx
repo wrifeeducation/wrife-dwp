@@ -59,7 +59,7 @@ export default function VerbIdentification({ level, onSubmit, submitting }: Acti
           </div>
         )
       })}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
+      <button onClick={() => onSubmit({ picks: items.map((it, i) => ({ sentence: it.sentence, expected_verb: it.verb, pupil_pick: picks[i] ?? null })) })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
         {submitting ? 'Checking…' : 'Check my answers →'}
       </button>
     </div>

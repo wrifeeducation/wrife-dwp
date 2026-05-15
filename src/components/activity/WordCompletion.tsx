@@ -61,7 +61,7 @@ export default function WordCompletion({ level, onSubmit, submitting }: Activity
           </div>
         )
       })}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
+      <button onClick={() => onSubmit({ picks: items.map((it, i) => ({ stem: it.stem, expected: it.answer, options_shown: it.options, pupil_pick: picks[i] ?? null })) })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
         {submitting ? 'Checking…' : 'Check my answers'}
       </button>
     </div>

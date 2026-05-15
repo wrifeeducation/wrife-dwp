@@ -31,7 +31,7 @@ export default function SentenceJoin({ level, onSubmit, submitting }: ActivityPr
             className="w-full px-3 py-2 rounded-pwp-tile bg-white border-2 border-brand-primary/30 focus:border-brand-primary outline-none text-pwp-base" />
         </div>
       ))}
-      <button onClick={() => onSubmit({ answers })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
+      <button onClick={() => onSubmit({ answers: items.map((it, i) => ({ sentence_a: it.sentence_a, sentence_b: it.sentence_b, connector: it.connector, pupil_answer: answers[i] ?? '' })) })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
         {submitting ? 'Checking…' : 'Check my sentences'}
       </button>
     </div>

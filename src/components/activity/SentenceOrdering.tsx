@@ -44,7 +44,7 @@ export default function SentenceOrdering({ level, onSubmit, submitting }: Activi
           </div>
         )
       })}
-      <button onClick={() => onSubmit({ orders })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
+      <button onClick={() => onSubmit({ orders: items.map((it, i) => ({ correct_order: it.sentences, pupil_order: orders[i] ?? [] })) })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
         {submitting ? 'Checking…' : 'Check my order'}
       </button>
     </div>

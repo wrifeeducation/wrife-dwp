@@ -41,7 +41,7 @@ export default function SentenceStarter({ level, onSubmit, submitting }: Activit
           {it.hint && <p className="text-pwp-xs text-neutral-500 mt-1">{it.hint}</p>}
         </div>
       ))}
-      <button onClick={() => onSubmit({ completions })} disabled={!allReady || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-1">
+      <button onClick={() => onSubmit({ completions: items.map((it, i) => ({ starter: it.starter, pupil_completion: completions[i] ?? '' })) })} disabled={!allReady || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-1">
         {submitting ? 'Checking…' : 'Check my sentences'}
       </button>
     </div>

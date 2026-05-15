@@ -30,7 +30,7 @@ export default function CommonProper({ level, onSubmit, submitting }: ActivityPr
           </div>
         )
       })}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
+      <button onClick={() => onSubmit({ picks: items.map((it, i) => ({ word: it.word, expected: it.type, pupil_answer: picks[i] ?? null })) })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
         {submitting ? 'Checking…' : 'Check my answers →'}
       </button>
     </div>

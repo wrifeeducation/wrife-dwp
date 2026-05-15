@@ -30,7 +30,7 @@ export default function SentenceFix({ level, onSubmit, submitting }: ActivityPro
           />
         </label>
       ))}
-      <button onClick={() => onSubmit({ answers })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
+      <button onClick={() => onSubmit({ answers: items.map((it, i) => ({ input: it.input, expected: it.target, pupil_answer: answers[i] ?? '' })) })} disabled={submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-2">
         {submitting ? 'Checking…' : 'Check my answers'}
       </button>
     </div>

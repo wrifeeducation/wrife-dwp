@@ -26,7 +26,7 @@ export default function NounVerbLogic({ level, onSubmit, submitting }: ActivityP
           </div>
         </div>
       ))}
-      <button onClick={() => onSubmit({ picks })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
+      <button onClick={() => onSubmit({ picks: items.map((it, i) => ({ pair: it.pair, expected: it.answer, pupil_answer: picks[i] ?? null })) })} disabled={!allAnswered || submitting} className="btn-wrife-cta btn-wrife-cta--primary">
         {submitting ? 'Checking…' : 'Check my answers →'}
       </button>
     </div>
