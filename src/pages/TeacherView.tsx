@@ -7,7 +7,7 @@ import CreateClassForm from '@/components/dashboard/CreateClassForm'
 import CredentialsCard from '@/components/dashboard/CredentialsCard'
 import { useHomeAccount } from '@/hooks/useHomeAccount'
 
-interface ClassRow { id: string; class_code: string; class_name: string; year_group: string | null }
+interface ClassRow { id: string; class_code: string; name: string; year_group: string | null }
 interface PupilRow { id: string; username: string; display_name: string; year_group: string | null; class_id: string }
 
 export default function TeacherView() {
@@ -23,7 +23,17 @@ export default function TeacherView() {
     let cancelled = false
     async function load() {
       if (!account) return
-      const { data: cls } = await supabase.from('classes').select('id, class_code, class_name, year_group').eq('owner_id', account.id).order('class_name')
+
+      // School teachers own classes via teacher_id (= auth.uid() = profiles.id).
+      // Independent teachers own classes via home_account_id (= home_accounts.id).
+      let query = supabase.from('classes').select('id, class_code, name, year_group')
+      if (account.isSchoolAccount) {
+        query = query.eq('teacher_id', account.id)
+      } else {
+        query = query.eq('home_account_id', account.id)
+      }
+      const { data: cls } = await query.order('name')
+
       if (cancelled) return
       const list = (cls ?? []) as ClassRow[]
       setClasses(list)
@@ -77,7 +87,7 @@ export default function TeacherView() {
         {classes.length === 0 ? (
           <>
             <p className="text-pwp-base text-neutral-700 mb-4">No classes yet. Create your first class to get started.</p>
-            <CreateClassForm homeAccountId={account.id} onCreated={() => setRefreshTick((t) => t + 1)} />
+            <CreateClassForm account={account} onCreated={() => setRefreshTick((t) => t + 1)} />
           </>
         ) : (
           <>
@@ -88,7 +98,7 @@ export default function TeacherView() {
                   <button key={c.id} onClick={() => setSelectedClassId(c.id)}
                     className={`px-3 py-1.5 rounded-pwp-pill text-pwp-sm font-bold transition-colors ${selectedClassId === c.id ? 'bg-brand-primary text-white' : 'bg-surface-practice-bg text-brand-primary'}`}
                     style={selectedClassId === c.id ? { borderBottom: '3px solid #3d35a0' } : {}}>
-                    {c.class_name} {c.year_group ? `· ${c.year_group}` : ''}
+                    {c.name} {c.year_group ? `· ${c.year_group}` : ''}
                   </button>
                 ))}
               </div>
@@ -118,7 +128,7 @@ export default function TeacherView() {
               <AddPupilForm context="teacher" classId={selectedClassId} onCreated={(r) => { setNewCreds(r); setRefreshTick((t) => t + 1) }} />
             )}
 
-            <CreateClassForm homeAccountId={account.id} onCreated={() => setRefreshTick((t) => t + 1)} />
+            <CreateClassForm account={account} onCreated={() => setRefreshTick((t) => t + 1)} />
           </>
         )}
       </section>

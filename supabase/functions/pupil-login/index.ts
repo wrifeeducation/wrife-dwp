@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     // 1. Find the class by code
     const { data: classRow, error: classErr } = await admin
       .from('classes')
-      .select('id, class_name, account_type')
+      .select('id, name, account_type')
       .eq('class_code', classCode)
       .maybeSingle()
     if (classErr) return err(500, 'db_error', classErr.message)
@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
           display_name: pupil.display_name,
           username: pupil.username,
           class_id: pupil.class_id,
-          class_name: classRow.class_name,
+          class_name: classRow.name,
           class_code: classCode,
           year_group: pupil.year_group,
           source: pupil.source,

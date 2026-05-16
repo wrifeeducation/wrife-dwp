@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import ErrorBanner from '@/components/shell/ErrorBanner'
+import type { HomeAccount } from '@/hooks/useHomeAccount'
 
 interface Props {
-  homeAccountId: string
+  account: HomeAccount
   onCreated: () => void
 }
 
@@ -15,7 +16,7 @@ function generateClassCode(): string {
   return out
 }
 
-export default function CreateClassForm({ homeAccountId, onCreated }: Props) {
+export default function CreateClassForm({ account, onCreated }: Props) {
   const [className, setClassName] = useState('')
   const [yearGroup, setYearGroup] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -27,13 +28,26 @@ export default function CreateClassForm({ homeAccountId, onCreated }: Props) {
     setSubmitting(true); setError(null)
     try {
       const code = generateClassCode()
-      const { error: insertErr } = await supabase.from('classes').insert({
-        class_code: code,
-        class_name: className.trim(),
-        account_type: 'independent_teacher',
-        owner_id: homeAccountId,
-        year_group: yearGroup || null,
-      })
+
+      // School teachers (from profiles) link via teacher_id = auth.uid() = account.id.
+      // Independent teachers (from home_accounts) link via home_account_id = account.id.
+      const classRow = account.isSchoolAccount
+        ? {
+            class_code: code,
+            name: className.trim(),
+            account_type: 'school',
+            teacher_id: account.id,
+            year_group: yearGroup || null,
+          }
+        : {
+            class_code: code,
+            name: className.trim(),
+            account_type: 'independent_teacher',
+            home_account_id: account.id,
+            year_group: yearGroup || null,
+          }
+
+      const { error: insertErr } = await supabase.from('classes').insert(classRow)
       if (insertErr) {
         if (insertErr.message.toLowerCase().includes('class_code')) {
           setError('That class code happened to collide — try again.')

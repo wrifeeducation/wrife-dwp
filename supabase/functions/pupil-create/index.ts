@@ -85,21 +85,21 @@ Deno.serve(async (req) => {
 
     if (classId) {
       // Indie-teacher path: verify caller owns this class
-      const { data: cls } = await admin.from('classes').select('id, class_code, owner_id').eq('id', classId).maybeSingle()
-      if (!cls || cls.owner_id !== account.id) return err(403, 'not_class_owner', 'You don\'t own that class.')
+      const { data: cls } = await admin.from('classes').select('id, class_code, home_account_id').eq('id', classId).maybeSingle()
+      if (!cls || cls.home_account_id !== account.id) return err(403, 'not_class_owner', 'You don\'t own that class.')
       classCode = cls.class_code
     } else if (account.account_type === 'parent') {
       // Parent path: auto-create or reuse the home class
-      const { data: existing } = await admin.from('classes').select('id, class_code').eq('owner_id', account.id).eq('account_type', 'home').maybeSingle()
+      const { data: existing } = await admin.from('classes').select('id, class_code').eq('home_account_id', account.id).eq('account_type', 'home').maybeSingle()
       if (existing) {
         classId = existing.id; classCode = existing.class_code
       } else {
         classCode = generateClassCode()
         const { data: created, error: createErr } = await admin.from('classes').insert({
           class_code: classCode,
-          class_name: 'My Family',
+          name: 'My Family',
           account_type: 'home',
-          owner_id: account.id,
+          home_account_id: account.id,
         }).select('id').single()
         if (createErr || !created) return err(500, 'class_create_failed', createErr?.message ?? 'create failed')
         classId = created.id

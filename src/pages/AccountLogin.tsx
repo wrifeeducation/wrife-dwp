@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase'
 /**
  * Adult email + password sign-in.
  *
- * Used by parents (Route C) and independent teachers (Route D) who already
- * confirmed their account. After successful sign-in, we look up the
- * home_accounts row to decide whether to send them to /parent or /teacher.
+ * Supports:
+ *   - Parents (Route C) — home_accounts.account_type = 'parent' → /parent
+ *   - Independent teachers (Route D) — home_accounts.account_type = 'independent_teacher' → /teacher
+ *   - School teachers / admins — profiles.role = 'teacher' | 'admin' → /teacher
  */
 export default function AccountLogin() {
   const nav = useNavigate()
@@ -23,13 +24,29 @@ export default function AccountLogin() {
     if (submitting) return
     setSubmitting(true); setError(null)
     try {
-      const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
+      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      })
       if (signInErr || !data.user) { setError(friendly(signInErr?.message ?? '')); return }
-      const { data: account } = await supabase.from('home_accounts').select('account_type').eq('auth_user_id', data.user.id).maybeSingle()
-      const accountType = account?.account_type
-      if (accountType === 'parent') nav('/parent', { replace: true })
-      else if (accountType === 'independent_teacher') nav('/teacher', { replace: true })
-      else nav('/', { replace: true })
+
+      // 1. Check home_accounts (parents + independent teachers)
+      const { data: homeAccount } = await supabase
+        .from('home_accounts').select('account_type').eq('auth_user_id', data.user.id).maybeSingle()
+
+      if (homeAccount?.account_type === 'parent') { nav('/parent', { replace: true }); return }
+      if (homeAccount?.account_type === 'independent_teacher') { nav('/teacher', { replace: true }); return }
+
+      // 2. Fall back to profiles (school teachers + admins from wrife.co.uk)
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', data.user.id).maybeSingle()
+
+      if (profile?.role === 'teacher' || profile?.role === 'admin') {
+        nav('/teacher', { replace: true }); return
+      }
+
+      // 3. Anything else (e.g. pupil auth user who ended up here) — send home
+      nav('/', { replace: true })
     } finally { setSubmitting(false) }
   }
 
