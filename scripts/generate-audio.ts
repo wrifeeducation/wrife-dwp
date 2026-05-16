@@ -17,7 +17,7 @@ import { join, dirname } from 'node:path'
 
 const VOICE_ID = process.env.ELEVENLABS_VOICE_ID!
 const API_KEY = process.env.ELEVENLABS_API_KEY!
-const SUPABASE_URL = process.env.VITE_DWP_SUPABASE_URL || process.env.SUPABASE_URL!
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!VOICE_ID || !API_KEY || !SUPABASE_URL || !SERVICE_KEY) {

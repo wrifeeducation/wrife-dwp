@@ -19,7 +19,7 @@ interface Check {
 
 const checks: Check[] = [
   {
-    key: 'VITE_DWP_SUPABASE_URL',
+    key: 'VITE_SUPABASE_URL',
     required: true,
     validate: (v) => {
       if (!/^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(v)) {
@@ -29,7 +29,7 @@ const checks: Check[] = [
     },
   },
   {
-    key: 'VITE_DWP_SUPABASE_ANON_KEY',
+    key: 'VITE_SUPABASE_ANON_KEY',
     required: true,
     validate: (v) => {
       if (!v.startsWith('eyJ')) return 'Anon key should start with "eyJ" (it\'s a JWT). Did you paste the service_role key by mistake?'
