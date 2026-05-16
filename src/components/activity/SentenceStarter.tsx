@@ -26,7 +26,7 @@ export default function SentenceStarter({ level, onSubmit, submitting }: Activit
       {items.map((it, i) => (
         <div key={i} className="bg-surface-practice-bg rounded-pwp-tile p-3">
           {it.example && (
-            <p className="text-pwp-xs text-neutral-500 italic mb-2">e.g. {it.example}</p>
+            <p className="text-pwp-sm text-neutral-500 italic mb-2">e.g. {it.example}</p>
           )}
           <div className="flex items-center gap-2">
             <span className="text-pwp-md font-extrabold text-brand-primary whitespace-nowrap">{it.starter}</span>
@@ -38,7 +38,7 @@ export default function SentenceStarter({ level, onSubmit, submitting }: Activit
               className="flex-1 bg-white border-2 border-brand-primary/30 focus:border-brand-primary rounded-pwp-tile px-3 py-2 text-pwp-base outline-none"
             />
           </div>
-          {it.hint && <p className="text-pwp-xs text-neutral-500 mt-1">{it.hint}</p>}
+          {it.hint && <p className="text-pwp-sm text-neutral-500 mt-1">{it.hint}</p>}
         </div>
       ))}
       <button onClick={() => onSubmit({ completions: items.map((it, i) => ({ starter: it.starter, pupil_completion: completions[i] ?? '' })) })} disabled={!allReady || submitting} className="btn-wrife-cta btn-wrife-cta--primary mt-1">

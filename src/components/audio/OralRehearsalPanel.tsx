@@ -21,7 +21,7 @@ export default function OralRehearsalPanel({ onDraftReady }: Props) {
       <p className="text-pwp-xs font-extrabold text-brand-primary uppercase tracking-wide mb-2">
         🎤 Say it first
       </p>
-      <p className="text-pwp-sm text-neutral-700 mb-3">
+      <p className="text-pwp-base text-neutral-700 mb-3">
         Speak your sentence aloud. We'll show it as a draft you can edit before you type.
       </p>
       <MicButton onTranscript={setDraft} />
@@ -30,7 +30,7 @@ export default function OralRehearsalPanel({ onDraftReady }: Props) {
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            className="w-full bg-white border-2 border-brand-primary/30 rounded-pwp-tile px-3 py-2 text-pwp-sm"
+            className="w-full bg-white border-2 border-brand-primary/30 rounded-pwp-tile px-3 py-2 text-pwp-base"
             rows={2}
           />
           <button

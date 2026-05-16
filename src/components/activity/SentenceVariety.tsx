@@ -29,7 +29,7 @@ export default function SentenceVariety({ level, onSubmit, submitting }: Activit
       {meta.topic && (
         <div className="bg-surface-prompt-chip rounded-pwp-tile px-4 py-3 border-l-[3px] border-brand-secondary">
           <p className="text-pwp-xs font-extrabold text-orange-700 uppercase tracking-wide mb-1">Today's topic</p>
-          <p className="text-pwp-sm text-neutral-800">{meta.topic}</p>
+          <p className="text-pwp-base font-medium text-neutral-800">{meta.topic}</p>
         </div>
       )}
       {meta.required.map((t) => {
@@ -37,8 +37,8 @@ export default function SentenceVariety({ level, onSubmit, submitting }: Activit
         return (
           <div key={t} className="bg-white border-2 border-brand-primary/15 rounded-pwp-tile p-3">
             <p className="text-pwp-xs font-extrabold text-brand-primary uppercase tracking-wide mb-1">{m.label} sentence</p>
-            <p className="text-pwp-xs text-neutral-500 mb-1">{m.description}</p>
-            <p className="text-pwp-xs text-neutral-400 italic mb-2">e.g. {m.example}</p>
+            <p className="text-pwp-sm text-neutral-500 mb-1">{m.description}</p>
+            <p className="text-pwp-sm text-neutral-400 italic mb-2">e.g. {m.example}</p>
             <textarea
               value={drafts[t]}
               onChange={(e) => setDrafts((d) => ({ ...d, [t]: e.target.value }))}

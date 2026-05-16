@@ -47,9 +47,9 @@ export default function LevelStart() {
             <p className="text-pwp-base font-bold text-neutral-800">{level.prompt_title}</p>
             <TTSPlayer src={levelIntroUrl(level.level_id)} label="Hear it" size="sm" />
           </div>
-          <p className="text-pwp-sm text-neutral-600">{level.prompt_instructions}</p>
+          <p className="text-pwp-base text-neutral-700">{level.prompt_instructions}</p>
           {level.prompt_example && (
-            <p className="text-pwp-sm text-neutral-500 mt-2 italic">e.g. {level.prompt_example}</p>
+            <p className="text-pwp-base text-neutral-500 mt-2 italic">e.g. {level.prompt_example}</p>
           )}
         </div>
       </section>
@@ -58,7 +58,7 @@ export default function LevelStart() {
       <section className="px-5">
         <div className="bg-surface-prompt-chip rounded-pwp-tile px-4 py-3 border-l-[3px] border-brand-secondary">
           <p className="text-pwp-xs font-extrabold text-orange-700 uppercase tracking-wide mb-1">Today you'll</p>
-          <p className="text-pwp-sm text-neutral-800">{level.learning_objective}</p>
+          <p className="text-pwp-base text-neutral-800">{level.learning_objective}</p>
         </div>
       </section>
 

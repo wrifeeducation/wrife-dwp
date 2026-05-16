@@ -31,13 +31,13 @@ export default function ShowcaseNarrative({ level, onSubmit, submitting }: Activ
       {meta.showcase && (
         <div className="bg-brand-primary/10 border-2 border-brand-primary rounded-pwp-banner p-3 text-center">
           <p className="text-pwp-xs font-extrabold text-brand-primary uppercase tracking-wide">👑 Programme Finale</p>
-          <p className="text-pwp-sm text-neutral-700">This is the final challenge. Take your time and show off everything you've learned.</p>
+          <p className="text-pwp-base text-neutral-700">This is the final challenge. Take your time and show off everything you've learned.</p>
         </div>
       )}
       {meta.prompt && (
         <div className="bg-surface-prompt-chip rounded-pwp-tile px-4 py-3 border-l-[3px] border-brand-secondary">
           <p className="text-pwp-xs font-extrabold text-orange-700 uppercase tracking-wide mb-1">Story prompt</p>
-          <p className="text-pwp-sm text-neutral-800">{meta.prompt}</p>
+          <p className="text-pwp-md font-bold text-neutral-800">{meta.prompt}</p>
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">

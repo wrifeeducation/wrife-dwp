@@ -21,14 +21,14 @@ export default function FreeWriting({ level, onSubmit, submitting, minWords = 1,
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-pwp-sm text-neutral-600">{promptText}</p>
+      <p className="text-pwp-md font-bold text-neutral-800">{promptText}</p>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Write here…"
-        className="w-full bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary outline-none rounded-pwp-tile px-3 py-3 text-pwp-base font-medium min-h-[180px]"
+        className="w-full bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary outline-none rounded-pwp-tile px-3 py-3 text-pwp-md font-medium min-h-[180px] leading-relaxed"
       />
-      <div className="flex justify-between text-pwp-xs text-neutral-500">
+      <div className="flex justify-between text-pwp-sm text-neutral-500">
         <span>{wordCount} word{wordCount === 1 ? '' : 's'}</span>
         {wordCount < effectiveMin && <span className="text-orange-600">Aim for at least {effectiveMin} words</span>}
       </div>

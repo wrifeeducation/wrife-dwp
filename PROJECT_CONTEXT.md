@@ -1,34 +1,35 @@
 # WriFe DWP (Daily Writing Practice)
-*Last updated: 2026-05-16 · Session 2*
+*Last updated: 2026-05-16 · Session 4*
 
 ## Current state
-`dailywrite.wrife.co.uk` is live and deployed on Vercel. The app connects to the shared WriFe Platform Supabase project (`gzmgjkbtsvezfclmreru`). All 405 ElevenLabs audio files are uploaded to the `dwp-audio` Storage bucket and play correctly. Auth now works for all three user types: school teachers (wrife.co.uk credentials), independent teachers/parents (home_accounts), and pupils (class code + username + PIN via `pupil-login` Edge Function).
+`dailywrite.wrife.co.uk` is fully operational. Pupil login (Route B) works for all pupil types. Audio is live — all 405 ElevenLabs MP3s (365 daily prompts + 40 level intros) are uploaded to the `dwp-audio` Supabase Storage bucket and confirmed playing at HTTP 200. Esma K (Silver Birch) tested end-to-end: login → level 1 intro audio plays. Direct sign-up routes exist for home learners (Route C) and independent teachers (Route D) but have no Stripe paywall yet.
 
 ## Next steps
-1. **Test the full login flow** — school teacher at `/account/login`, then create a class and add a pupil, then log in as that pupil at `/login`
-2. **Add DWP SSO tile to wrife.co.uk teacher dashboard** — school teachers currently have no tile to reach DWP from wrife.co.uk (only the pupil dashboard tile was added)
-3. **Apply pending wrife-website migrations** — `20260511_school_registrations.sql` and `20260511000001_ai_attempts.sql` still need applying
+1. **Add Stripe paywall to Route C/D sign-up** — `/home-signup` and `/teacher-signup` currently create accounts with no payment; add Stripe checkout before account creation completes
+2. **Commit and push v19 Edge Function** — `git add supabase/functions/pupil-login/index.ts && git commit -m "fix(pupil-login): v19 — default bcrypt import" && git push origin main`
+3. **Add DWP SSO tile to wrife.co.uk teacher dashboard** — school teachers have no tile to reach DWP from the hub
+4. **Apply pending wrife-website migrations** — `20260511_school_registrations.sql` and `20260511000001_ai_attempts.sql`
 
 ## Key decisions
-- **Shared Supabase project:** DWP uses `gzmgjkbtsvezfclmreru` (WriFe Platform) — NOT its own project. Legacy project `nxhkpqngnxshgotvuujb` is safe to delete (0 rows).
-- **`pupils` table schema:** Added `pin_hash`, `auth_email`, `source` columns and changed `class_id` from integer to UUID via migration `dwp_fix_pupils_schema`. All 53 existing rows had null class_id so the type change was safe.
-- **`classes` table:** Real column names are `name` (not `class_name`) and `home_account_id` (not `owner_id`). All DWP code now uses the correct names.
-- **School teacher auth on DWP:** Falls back to `profiles.role = 'teacher'/'admin'` after checking `home_accounts`. TeacherView queries by `teacher_id` for school accounts, `home_account_id` for independent teachers.
-- **Audio bucket:** `dwp-audio` bucket created with public read RLS. Files served at `dwp-audio/levels/{level_id}/intro.mp3` and `dwp-audio/daily/{slug}.mp3`.
+- **`import * as bcrypt` is broken on esm.sh:** Namespace import does not expose `compareSync`, `compare`, or `hashSync`. Always use: `import bcrypt from 'https://esm.sh/bcryptjs@2.4.3'` in Edge Functions.
+- **Route B confirmed for all pupil types:** School pupils, home learners, and independent teacher pupils all log in directly on DWP. Ecosystem skill updated.
+- **Audio files must be manually uploaded to Supabase Storage:** `public/audio/` is git-ignored; `generate-audio.ts` uses local cache as done-marker so re-runs skip uploads. Use `scripts/upload-audio-to-storage.mjs` to push to bucket. Run with `node scripts/upload-audio-to-storage.mjs` from project root.
+- **`pupils` lookup via `class_members`:** `pupils.class_id` is NULL for school pupils. Pupil-login finds them via `class_members` junction table.
+- **Two PIN formats in DB:** 9 Silver Birch pupils have bcrypt hashes; 16 have plaintext 4-digit PINs (legacy import). v19 handles both, upgrades plaintext to bcrypt on first login.
+- **Shared Supabase project:** DWP uses `gzmgjkbtsvezfclmreru` — NOT its own project.
+- **No Stripe paywall yet:** Route C/D sign-up creates free accounts. This is a known gap.
 
 ## Files & locations
-- `src/hooks/useHomeAccount.ts` — extended to fall back to `profiles` for school teachers; returns `isSchoolAccount: boolean`
-- `src/pages/AccountLogin.tsx` — now routes school teachers (`profiles.role`) to `/teacher`
-- `src/pages/TeacherView.tsx` — dual query: `teacher_id` for school accounts, `home_account_id` for independent
-- `src/components/dashboard/CreateClassForm.tsx` — fixed `owner_id`→`home_account_id`, `class_name`→`name`
-- `supabase/functions/pupil-login/` — deployed v11; fixed `class_name`→`name` column
-- `supabase/functions/pupil-create/` — deployed v2; fixed column names + added school teacher support
-- `supabase/migrations/20260518200000_dwp_fix_pupils_schema.sql` — adds DWP columns to `pupils`, changes class_id to UUID
-- `scripts/generate-audio.ts` — generates ElevenLabs MP3s; requires `SUPABASE_SERVICE_ROLE_KEY` in `.env`
+- `supabase/functions/pupil-login/index.ts` — v19 deployed; default bcrypt import, handles bcrypt + plaintext PINs
+- `scripts/upload-audio-to-storage.mjs` — uploads all MP3s from `public/audio/` to `dwp-audio` bucket; reads from `.env` or `.env.local`
+- `src/lib/audio/tts.ts` — builds Supabase Storage public URLs; `levelIntroUrl(levelId)` and `dailyPromptUrl(slug)`
+- `src/components/audio/TTSPlayer.tsx` — plays audio via `new Audio(src)`; was correct all along, just had no files
+- `src/pages/HomeSignup.tsx` / `src/pages/TeacherSignup.tsx` — Route C/D sign-up (no paywall yet)
+- `supabase/migrations/20260518200000_dwp_fix_pupils_schema.sql` — adds DWP columns to shared `pupils` table
 
 ## Open questions
-- Does the `dwp-tts-feedback` Edge Function need redeploying after the bucket creation?
-- Should school pupils be able to log in directly on DWP (bypassing Route A from wrife.co.uk)?
+- Does wrife.co.uk populate `class_members` for every new pupil added to a class? (DWP Route B depends on it.)
+- `dwp-tts-feedback` Edge Function — does it still need a redeploy?
 
 ---
 
@@ -36,5 +37,7 @@
 
 | # | Date | Summary |
 |---|------|---------|
-| 2 | 2026-05-16 | Fixed ElevenLabs audio pipeline (bucket, script bugs); fixed full DWP auth for teachers + pupils; fixed `classes`/`pupils` schema column name bugs throughout |
-| 1 | 2026-05-15 | Built and deployed DWP app — Vercel env vars, Edge Functions, daily prompts seed, SSO tile on wrife.co.uk pupil dashboard |
+| 4 | 2026-05-16 | Fixed audio: uploaded 405 MP3s to dwp-audio Supabase bucket via upload script; confirmed HTTP 200 + audio plays live for Esma K / Silver Birch |
+| 3 | 2026-05-16 | Diagnosed and fixed bcrypt bug in pupil-login (v19): `import * as bcrypt` silently breaks all bcrypt calls on esm.sh; switched to default import |
+| 2 | 2026-05-16 | Fixed ElevenLabs audio pipeline; fixed full DWP auth for teachers + pupils; fixed schema column name bugs |
+| 1 | 2026-05-15 | Built and deployed DWP — Vercel env vars, Edge Functions, daily prompts seed, SSO tile on wrife.co.uk pupil dashboard |

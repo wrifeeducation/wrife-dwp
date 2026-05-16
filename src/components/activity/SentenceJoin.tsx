@@ -20,8 +20,8 @@ export default function SentenceJoin({ level, onSubmit, submitting }: ActivityPr
       </p>
       {items.map((it, i) => (
         <div key={i} className="bg-surface-practice-bg rounded-pwp-tile p-3">
-          <p className="text-pwp-sm text-neutral-700 mb-1">{it.sentence_a}</p>
-          <p className="text-pwp-sm text-neutral-700 mb-2">{it.sentence_b}</p>
+          <p className="text-pwp-base text-neutral-700 mb-1">{it.sentence_a}</p>
+          <p className="text-pwp-base text-neutral-700 mb-2">{it.sentence_b}</p>
           <p className="text-pwp-xs text-orange-700 font-extrabold mb-2 uppercase tracking-wide">
             Join with: <span className="bg-surface-prompt-chip px-2 py-0.5 rounded-pwp-pill">{it.connector}</span>
           </p>
