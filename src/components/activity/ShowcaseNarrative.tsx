@@ -20,7 +20,8 @@ function countSentences(text: string): number {
  * celebration framing as the programme finale.
  */
 export default function ShowcaseNarrative({ level, onSubmit, submitting }: ActivityProps) {
-  const meta = (level.items as unknown as ShowcaseItems) ?? { target_sentences: 10 }
+  const rawMetaN = Array.isArray(level.items) ? level.items[0] : level.items
+  const meta = (rawMetaN as unknown as ShowcaseItems) ?? { target_sentences: 10 }
   const [text, setText] = useState('')
   const sentenceCount = countSentences(text)
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0

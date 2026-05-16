@@ -22,7 +22,8 @@ const SECTION_META: Record<Section, { label: string; emoji: string; placeholder:
  * as one composite submission so the AI grader can evaluate structure.
  */
 export default function StoryPlanner({ level, onSubmit, submitting }: ActivityProps) {
-  const meta = (level.items as unknown as PlannerItems) ?? {
+  const rawMetaS = Array.isArray(level.items) ? level.items[0] : level.items
+  const meta = (rawMetaS as unknown as PlannerItems) ?? {
     prompt: level.prompt_instructions,
     sections: ['beginning', 'middle', 'end'],
   }

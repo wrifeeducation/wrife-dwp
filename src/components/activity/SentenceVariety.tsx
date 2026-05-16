@@ -18,7 +18,8 @@ const TYPE_META: Record<SentenceType, { label: string; description: string; exam
  * complex) on a single topic.
  */
 export default function SentenceVariety({ level, onSubmit, submitting }: ActivityProps) {
-  const meta = (level.items as unknown as VarietyItems) ?? { required: ['simple', 'compound', 'complex'] }
+  const rawMetaV = Array.isArray(level.items) ? level.items[0] : level.items
+  const meta = (rawMetaV as unknown as VarietyItems) ?? { required: ['simple', 'compound', 'complex'] }
   const [drafts, setDrafts] = useState<Record<SentenceType, string>>(
     Object.fromEntries(meta.required.map((t) => [t, ''])) as Record<SentenceType, string>
   )
