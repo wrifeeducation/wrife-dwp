@@ -92,7 +92,9 @@ Deno.serve(async (req) => {
     const username = (body.username ?? '').trim().toLowerCase()
     const displayName = (body.display_name ?? '').trim()
     const pin = (body.pin ?? '').trim()
-    const yearGroup = (body.year_group ?? '').trim() || null
+    // pupils.year_group is INTEGER — cast string input. Null if blank or non-numeric.
+    const yearGroupRaw = (body.year_group ?? '').trim()
+    const yearGroup = yearGroupRaw ? (parseInt(yearGroupRaw, 10) || null) : null
 
     if (!username || !displayName || !pin) return err(400, 'missing_fields', 'display_name, username and pin are required.')
     if (!/^[a-z0-9_]{3,20}$/.test(username)) return err(400, 'username_invalid', 'Username must be 3-20 letters, digits or underscores.')
@@ -174,10 +176,14 @@ Deno.serve(async (req) => {
     })
     if (createErr || !created.user) return err(500, 'auth_create_failed', createErr?.message ?? 'create failed')
 
-    // Insert pupil row — password_hash holds the bcrypt PIN (matches wrife.co.uk)
+    // Insert pupil row — password_hash holds the bcrypt PIN (matches wrife.co.uk).
+    // first_name is NOT NULL on the shared pupils table (wrife-website-owned schema).
+    // We use displayName as first_name — acceptable for DWP-created pupils who don't
+    // have separate first/last names in their profile.
     const { data: pupil, error: pupilErr } = await admin.from('pupils').insert({
       id: pupilId,
       auth_user_id: pupilId,
+      first_name: displayName,
       username,
       display_name: displayName,
       password_hash: passwordHash,

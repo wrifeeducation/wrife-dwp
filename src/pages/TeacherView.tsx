@@ -8,7 +8,9 @@ import CredentialsCard from '@/components/dashboard/CredentialsCard'
 import { useHomeAccount } from '@/hooks/useHomeAccount'
 
 interface ClassRow { id: string; class_code: string; name: string; year_group: string | null }
-interface PupilRow { id: string; username: string; display_name: string; year_group: string | null; class_id: string }
+// class_id here comes from class_members (the junction table), not pupils.class_id
+// which is NULL for all DWP-created pupils (wrife-website-owned, uses class_members architecture)
+interface PupilRow { id: string; username: string; display_name: string; year_group: number | null; class_id: string }
 
 export default function TeacherView() {
   const { account, loading: accountLoading } = useHomeAccount()
@@ -40,8 +42,19 @@ export default function TeacherView() {
       if (!selectedClassId && list.length > 0) setSelectedClassId(list[0].id)
       if (list.length > 0) {
         const ids = list.map((c) => c.id)
-        const { data: pp } = await supabase.from('pupils').select('id, username, display_name, year_group, class_id').in('class_id', ids)
-        setPupils((pp ?? []) as PupilRow[])
+        // pupils.class_id is NULL for all DWP-created pupils — the ecosystem uses
+        // class_members as the junction table. Query via class_members and join pupils.
+        const { data: memberships } = await supabase
+          .from('class_members')
+          .select('class_id, pupils(id, username, display_name, year_group)')
+          .in('class_id', ids)
+        // Flatten into PupilRow[], injecting class_id from the membership row
+        const flat: PupilRow[] = (memberships ?? []).flatMap((m) => {
+          const p = m.pupils as { id: string; username: string; display_name: string; year_group: number | null } | null
+          if (!p) return []
+          return [{ ...p, class_id: m.class_id }]
+        })
+        setPupils(flat)
       } else {
         setPupils([])
       }

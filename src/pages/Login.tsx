@@ -5,18 +5,17 @@ import ErrorBanner from '@/components/shell/ErrorBanner'
 import { pupilLogin, PupilLoginError } from '@/lib/auth/pupilLogin'
 
 /**
- * Route B — Pupil sign-in.
+ * Route B — Pupil sign-in for HOME LEARNERS and INDEPENDENT TEACHER pupils.
  *
  * Pupils enter the class_code their parent or teacher gave them, their
  * username (lowercase nickname), and their 4-digit PIN. The combination is
  * verified server-side by the pupil-login Edge Function which mints a real
  * Supabase session.
  *
- * Per wrife-brand-ecosystem rule, this page rejects school pupils — they
- * must enter via wrife.co.uk. School pupils show up here as class rows whose
- * account_type = 'school_shadow'; their direct-login attempt is rejected by
- * the Edge Function (not implemented yet — school_shadow classes don't exist
- * until the SSO bridge is built).
+ * Per wrife-brand-ecosystem, Route B is RETIRED for school pupils.
+ * School pupils must log in at wrife.co.uk (Route A). If the Edge Function
+ * returns 'school_pupils_use_hub', we show a redirect prompt rather than
+ * a generic error.
  */
 export default function Login() {
   const nav = useNavigate()
@@ -25,9 +24,14 @@ export default function Login() {
   const [pin, setPin] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Set to true when server confirms this is a school class — show hub redirect
+  const [isSchoolPupil, setIsSchoolPupil] = useState(false)
 
   function friendlyError(err: PupilLoginError): string {
     switch (err.code) {
+      case 'school_pupils_use_hub':
+        // Handled by isSchoolPupil state — return empty string so ErrorBanner stays hidden
+        return ''
       case 'invalid_credentials':
         return 'That class code, username, or PIN doesn\'t match. Try again.'
       case 'pin_invalid':
@@ -44,15 +48,57 @@ export default function Login() {
     if (submitting) return
     setSubmitting(true)
     setError(null)
+    setIsSchoolPupil(false)
     try {
       await pupilLogin({ classCode, username, pin })
       nav('/', { replace: true })
     } catch (err) {
-      if (err instanceof PupilLoginError) setError(friendlyError(err))
-      else setError('Something went wrong. Please try again.')
+      if (err instanceof PupilLoginError) {
+        if (err.code === 'school_pupils_use_hub') {
+          setIsSchoolPupil(true)
+        } else {
+          setError(friendlyError(err))
+        }
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }
+  }
+
+  // School pupil detected — show a clear redirect prompt instead of the form
+  if (isSchoolPupil) {
+    return (
+      <AuthShell
+        title="Sign in via WriFe"
+        subtitle="Your school uses WriFe. Sign in there to access Daily Writing."
+        mood="welcome"
+        bottomLinks={[
+          { label: 'New family? Sign up here →', to: '/home-signup' },
+        ]}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-pwp-sm text-neutral-700">
+            That class code belongs to a school account. School pupils sign in at{' '}
+            <strong>wrife.co.uk</strong> — ask your teacher for the link.
+          </p>
+          <a
+            href="https://wrife.co.uk/pupil/login"
+            className="btn-wrife-cta btn-wrife-cta--primary text-center"
+          >
+            Go to wrife.co.uk →
+          </a>
+          <button
+            type="button"
+            onClick={() => setIsSchoolPupil(false)}
+            className="text-pwp-xs text-neutral-500 underline hover:text-neutral-700"
+          >
+            ← Try a different class code
+          </button>
+        </div>
+      </AuthShell>
+    )
   }
 
   return (
