@@ -199,6 +199,23 @@ Deno.serve(async (req) => {
           xp_total: (existing?.xp_total ?? 0) + xpEarned,
           last_active_at: new Date().toISOString(),
         }, { onConflict: 'pupil_id' })
+
+        // Write to learning_events so wrife.co.uk teacher dashboard can see progress.
+        // Per wrife-brand-ecosystem skill — sub-apps INSERT only, never ALTER this table.
+        await admin.from('learning_events').insert({
+          pupil_id: pupil.id,
+          app: 'dwp',
+          event_type: 'level_completed',
+          event_data: {
+            level_id: levelId,
+            band,
+            percentage: pct,
+            xp_earned: xpEarned,
+          },
+          class_id: pupil.class_id ?? null,
+        }).then(({ error: le }) => {
+          if (le) console.error('learning_events insert failed (non-fatal):', le.message)
+        })
       }
     } else if (mode === 'daily_prompt' && promptId) {
       const submissionText = (body.submission as any)?.text ?? ''
@@ -217,6 +234,22 @@ Deno.serve(async (req) => {
         feature_tags: parsedAssessment.feature_tags ?? [],
         band,
       })
+      // Write to learning_events — daily prompt submitted
+      await admin.from('learning_events').insert({
+        pupil_id: pupil.id,
+        app: 'dwp',
+        event_type: 'daily_prompt_submitted',
+        event_data: {
+          prompt_slug: prompt?.prompt_slug ?? '',
+          category: prompt?.category ?? 'narrative',
+          band,
+          word_count: wordCount,
+        },
+        class_id: pupil.class_id ?? null,
+      }).then(({ error: le }) => {
+        if (le) console.error('learning_events insert failed (non-fatal):', le.message)
+      })
+
       // Earn a seed for the matching biome — daily prompts always earn one
       const biome = categoryToBiome(prompt?.category ?? 'narrative')
       const seedWord = pickSeedWord(prompt?.word_seeds ?? [], submissionText)

@@ -2,20 +2,20 @@
 /**
  * DWP — Edge Function: pupil-login
  *
- * Handles Route B login for HOME and INDEPENDENT TEACHER pupils ONLY.
- *
- * Per the WriFe brand ecosystem, Route B is RETIRED for school pupils.
- * School pupils (classes with account_type = 'school') must log in via
- * wrife.co.uk (Route A). This function returns 403 'school_pupils_use_hub'
- * for any school class code so the client can redirect accordingly.
- *
- * Valid callers:
+ * Handles Route B direct login for ALL pupil types:
+ *   - School pupils (class account_type = 'school')
  *   - Home learners (class account_type = 'home')
  *   - Independent teacher pupils (class account_type = 'independent_teacher')
  *
+ * Route A (wrife.co.uk hub SSO) and Route B (direct sub-app login) are BOTH
+ * valid entry points for all pupil types. This matches PWP Studio behaviour.
+ * If a future configuration requires hub-only login for a class, this function
+ * may return 403 'school_pupils_use_hub' and the client should redirect to
+ * wrife.co.uk — but this is not the default behaviour.
+ *
  * Auth email format: pupil-{pupil.id}@practice.wrife.co.uk
  * This matches the wrife.co.uk provisioning format so the same auth user is
- * reused if a home-learner pupil later joins a school.
+ * reused whether the pupil arrived via Route A or Route B.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import * as bcrypt from 'https://esm.sh/bcryptjs@2.4.3'
@@ -72,13 +72,6 @@ Deno.serve(async (req) => {
       .maybeSingle()
     if (classErr) return err(500, 'db_error', classErr.message)
     if (!classRow) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
-
-    // 1a. Ecosystem compliance — Route B is retired for school pupils.
-    //     School classes (account_type = 'school') must enter via wrife.co.uk (Route A).
-    if (classRow.account_type === 'school') {
-      return err(403, 'school_pupils_use_hub',
-        'School pupils sign in at wrife.co.uk, not here. Ask your teacher for the link.')
-    }
 
     // 2. Get pupil IDs in this class via class_members
     const { data: members, error: membersErr } = await admin
