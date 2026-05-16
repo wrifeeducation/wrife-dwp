@@ -252,7 +252,7 @@ Deno.serve(async (req) => {
 
       // Earn a seed for the matching biome — daily prompts always earn one
       const biome = categoryToBiome(prompt?.category ?? 'narrative')
-      const seedWord = pickSeedWord(prompt?.word_seeds ?? [], submissionText)
+      const seedWord = pickSeedWord(prompt?.word_seeds ?? [], submissionText, biome)
       if (seedWord) {
         await admin.from('dwp_garden_seeds').insert({
           pupil_id: pupil.id, word: seedWord, biome, rarity: 'common',
@@ -305,12 +305,30 @@ function categoryToBiome(category: string): string {
   } as Record<string, string>)[category] ?? 'meadow'
 }
 
-function pickSeedWord(catalogue: string[], submission: string): string | null {
-  // Prefer a word from the prompt's curated word_seeds list that the pupil used.
+// Per-biome fallback word lists — used when a prompt has no curated word_seeds.
+// Each list mirrors the MEADOW_PLANTS / equivalent biome plant catalogue so that
+// seeds awarded here can actually appear in the Garden UI.
+const BIOME_FALLBACK_WORDS: Record<string, string[]> = {
+  meadow:          ['sparkle', 'gentle', 'wiggle', 'bumpy', 'rough', 'burst', 'enormous', 'tremble', 'delighted', 'gloomy', 'worried', 'astonished'],
+  grove:           ['adventure', 'journey', 'discover', 'wonder', 'brave', 'imagine', 'explore', 'mystery', 'courage', 'legend'],
+  stone_path:      ['because', 'therefore', 'however', 'despite', 'although', 'consequently', 'evidence', 'opinion', 'argument', 'persuade'],
+  reflection_pool: ['realise', 'grateful', 'remember', 'feeling', 'important', 'believe', 'learning', 'memory', 'growth', 'appreciate'],
+  workshop:        ['vivid', 'precise', 'detailed', 'crisp', 'striking', 'texture', 'colour', 'shape', 'pattern', 'contrast'],
+}
+
+function pickSeedWord(catalogue: string[], submission: string, biome = 'meadow'): string | null {
+  // 1. Prefer a word from the prompt's curated word_seeds list that the pupil actually used.
   for (const w of catalogue) {
     if (submission.toLowerCase().includes(w.toLowerCase())) return w
   }
-  // Otherwise, use the first catalogue word as a "freebie" — they earned a seed
-  // for submitting.
-  return catalogue[0] ?? null
+  // 2. Freebie from curated list (first word) if list is non-empty.
+  if (catalogue.length > 0) return catalogue[0]
+  // 3. Fallback: find a biome word the pupil actually used in their submission.
+  const fallback = BIOME_FALLBACK_WORDS[biome] ?? BIOME_FALLBACK_WORDS['meadow']
+  for (const w of fallback) {
+    if (submission.toLowerCase().includes(w.toLowerCase())) return w
+  }
+  // 4. Last resort freebie — they submitted, they earn a seed.
+  const dayOfYear = Math.floor(Date.now() / 86400000)
+  return fallback[dayOfYear % fallback.length]
 }

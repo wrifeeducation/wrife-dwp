@@ -48,7 +48,7 @@ export default function ShowcaseNarrative({ level, onSubmit, submitting }: Activ
           className="w-full bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary rounded-pwp-tile px-3 py-3 text-pwp-base outline-none min-h-[260px]"
         />
         {meta.bme_checklist && (
-          <aside className="md:w-44 bg-white border-2 border-brand-primary/15 rounded-pwp-tile p-3 text-pwp-xs text-neutral-700">
+          <aside className="md:w-44 bg-white border-2 border-brand-primary/15 rounded-pwp-tile p-3 text-pwp-sm text-neutral-700">
             <p className="font-extrabold text-brand-primary mb-2 uppercase tracking-wide">Aim for</p>
             <ul className="space-y-1.5">
               <li>🌅 Strong beginning</li>

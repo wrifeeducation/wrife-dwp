@@ -45,7 +45,7 @@ export default function WordCompletion({ level, onSubmit, submitting }: Activity
                 const selected = pick === opt
                 return (
                   <button key={opt} onClick={() => setPicks((p) => ({ ...p, [i]: opt }))}
-                    className="px-2.5 py-1.5 rounded-pwp-tile text-pwp-sm font-bold transition-colors"
+                    className="px-2.5 py-1.5 rounded-pwp-tile text-pwp-base font-bold transition-colors"
                     style={{
                       background: selected ? (colours?.bg ?? 'var(--color-brand-primary)') : 'white',
                       color: selected ? (colours?.text ?? 'white') : (colours?.text ?? '#333'),

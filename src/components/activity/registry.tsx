@@ -46,21 +46,21 @@ const REGISTRY: Partial<Record<ActivityType, ActivityComponent>> = {
   sentence_completion: WordCompletion,
   add_where: WordCompletion,
   add_when: WordCompletion,
-  who_what_where: FormulaBuilder,
+  who_what_where: FreeWriting,
   independent_milestone: FreeWriting,
 
   // Tier 4
-  enhance_adjectives: WordCompletion,
+  enhance_adjectives: FreeWriting,
   join_and: SentenceJoin,
   use_but: SentenceJoin,
   because_clauses: SentenceJoin,
   when_time: SentenceJoin,
-  multiple_details: FormulaBuilder,
+  multiple_details: FreeWriting,
   formula_sentence: FormulaBuilder,
 
   // Tier 5
   temporal_connectives: SentenceOrdering,
-  three_connected: SentenceOrdering,
+  three_connected: FreeWriting,
   before_after: SentenceOrdering,
   five_sentence_recount: FreeWriting,
 

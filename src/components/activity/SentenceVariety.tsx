@@ -37,7 +37,7 @@ export default function SentenceVariety({ level, onSubmit, submitting }: Activit
         return (
           <div key={t} className="bg-white border-2 border-brand-primary/15 rounded-pwp-tile p-3">
             <p className="text-pwp-xs font-extrabold text-brand-primary uppercase tracking-wide mb-1">{m.label} sentence</p>
-            <p className="text-pwp-sm text-neutral-500 mb-1">{m.description}</p>
+            <p className="text-pwp-base text-neutral-600 mb-1">{m.description}</p>
             <p className="text-pwp-sm text-neutral-400 italic mb-2">e.g. {m.example}</p>
             <textarea
               value={drafts[t]}
