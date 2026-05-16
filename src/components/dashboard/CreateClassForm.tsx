@@ -47,7 +47,7 @@ export default function CreateClassForm({ account, onCreated }: Props) {
             year_group: yearGroup || null,
           }
 
-      const { error: insertErr } = await supabase.from('classes').insert(classRow)
+      const { error: insertErr } = await supabase.from('classes').insert(classRow as any)
       if (insertErr) {
         if (insertErr.message.toLowerCase().includes('class_code')) {
           setError('That class code happened to collide — try again.')
