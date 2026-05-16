@@ -1,18 +1,17 @@
 /// <reference lib="deno.ns" />
 /**
- * DWP — Edge Function: pupil-login (v16)
+ * DWP — Edge Function: pupil-login (v19)
+ *
+ * FIX: `import * as bcrypt` from esm.sh does not expose compare/hashSync.
+ * Use default import so we get the real bcryptjs object with all methods.
  *
  * Handles Route B direct login for ALL pupil types.
- *
- * PIN verification handles two formats:
- *   1. Bcrypt hash (starts with $2a/$2b, length 60)
- *   2. Plaintext 4-digit PIN (school pupils from wrife.co.uk with plain storage)
- * On successful plaintext login the hash is silently upgraded to bcrypt (hashSync).
- *
- * Auth email: pupil-{pupil.id}@practice.wrife.co.uk
+ * Plaintext PIN fallback for school pupils imported from wrife.co.uk,
+ * with automatic upgrade to bcrypt on first successful login.
  */
+// @ts-ignore — bcryptjs has no default export declaration but esm.sh provides one
+import bcrypt from 'https://esm.sh/bcryptjs@2.4.3'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import * as bcrypt from 'https://esm.sh/bcryptjs@2.4.3'
 
 interface LoginBody {
   class_code?: string
@@ -89,7 +88,7 @@ Deno.serve(async (req) => {
     if (pupilErr) return err(500, 'db_error', pupilErr.message)
     if (!pupil) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
 
-    // 4. Verify PIN — bcrypt hash or plaintext fallback
+    // 4. Verify PIN
     const hashToVerify = pupil.password_hash ?? pupil.pin_hash
     if (!hashToVerify) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
 
@@ -97,7 +96,8 @@ Deno.serve(async (req) => {
     let needsHashUpgrade = false
 
     if (isBcryptHash(hashToVerify)) {
-      pinValid = await bcrypt.compare(pin, hashToVerify)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pinValid = (bcrypt as any).compareSync(pin, hashToVerify)
     } else {
       // Plaintext PIN stored directly (school pupils imported from wrife.co.uk)
       pinValid = (pin === hashToVerify)
@@ -141,12 +141,13 @@ Deno.serve(async (req) => {
       return err(500, 'auth_signin_failed', signInErr?.message ?? 'sign-in failed')
     }
 
-    // 7. Upgrade plaintext PIN to bcrypt (non-blocking, best-effort)
+    // 7. Upgrade plaintext PIN to bcrypt on first successful login (non-blocking)
     if (needsHashUpgrade) {
       try {
-        const newHash = bcrypt.hashSync(pin, 10)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const newHash = (bcrypt as any).hashSync(pin, 10)
         await admin.from('pupils').update({ password_hash: newHash }).eq('id', pupil.id)
-      } catch (_e) { /* non-fatal — next login will upgrade again */ }
+      } catch (_e) { /* non-fatal */ }
     }
 
     // 8. Ensure dwp_progress row exists
