@@ -50,7 +50,7 @@ export default function TeacherView() {
           .in('class_id', ids)
         // Flatten into PupilRow[], injecting class_id from the membership row
         const flat: PupilRow[] = (memberships ?? []).flatMap((m) => {
-          const p = m.pupils as { id: string; username: string; display_name: string; year_group: number | null } | null
+          const p = m.pupils as unknown as { id: string; username: string; display_name: string; year_group: number | null } | null
           if (!p) return []
           return [{ ...p, class_id: m.class_id }]
         })
