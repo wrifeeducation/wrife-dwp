@@ -140,7 +140,7 @@ export default function StepPractice() {
       <section className="px-5 py-5 max-w-3xl mx-auto">
         <h1 className="text-pwp-lg font-extrabold text-neutral-900 mb-1">{level.prompt_title}</h1>
         <p className="text-pwp-sm text-neutral-600 mb-5">{level.prompt_instructions}</p>
-        <Activity level={stepLevel} onSubmit={handleStepSubmit} submitting={submitting} />
+        <Activity key={stepIdx} level={stepLevel} onSubmit={handleStepSubmit} submitting={submitting} />
       </section>
 
       {/* Inter-step transition between Step N and Step N+1 */}
