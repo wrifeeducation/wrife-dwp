@@ -1,21 +1,15 @@
 /// <reference lib="deno.ns" />
 /**
- * DWP — Edge Function: pupil-login
+ * DWP — Edge Function: pupil-login (v16)
  *
- * Handles Route B direct login for ALL pupil types:
- *   - School pupils (class account_type = 'school')
- *   - Home learners (class account_type = 'home')
- *   - Independent teacher pupils (class account_type = 'independent_teacher')
+ * Handles Route B direct login for ALL pupil types.
  *
- * Route A (wrife.co.uk hub SSO) and Route B (direct sub-app login) are BOTH
- * valid entry points for all pupil types. This matches PWP Studio behaviour.
- * If a future configuration requires hub-only login for a class, this function
- * may return 403 'school_pupils_use_hub' and the client should redirect to
- * wrife.co.uk — but this is not the default behaviour.
+ * PIN verification handles two formats:
+ *   1. Bcrypt hash (starts with $2a/$2b, length 60)
+ *   2. Plaintext 4-digit PIN (school pupils from wrife.co.uk with plain storage)
+ * On successful plaintext login the hash is silently upgraded to bcrypt (hashSync).
  *
- * Auth email format: pupil-{pupil.id}@practice.wrife.co.uk
- * This matches the wrife.co.uk provisioning format so the same auth user is
- * reused whether the pupil arrived via Route A or Route B.
+ * Auth email: pupil-{pupil.id}@practice.wrife.co.uk
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import * as bcrypt from 'https://esm.sh/bcryptjs@2.4.3'
@@ -40,6 +34,9 @@ function generateRandomPassword(): string {
   const bytes = new Uint8Array(24)
   crypto.getRandomValues(bytes)
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+function isBcryptHash(value: string): boolean {
+  return (value.startsWith('$2a$') || value.startsWith('$2b$')) && value.length >= 60
 }
 
 Deno.serve(async (req) => {
@@ -92,14 +89,24 @@ Deno.serve(async (req) => {
     if (pupilErr) return err(500, 'db_error', pupilErr.message)
     if (!pupil) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
 
-    // 4. Verify PIN — try password_hash first (wrife.co.uk standard), then pin_hash (DWP-only fallback)
+    // 4. Verify PIN — bcrypt hash or plaintext fallback
     const hashToVerify = pupil.password_hash ?? pupil.pin_hash
     if (!hashToVerify) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
-    const pinValid = await bcrypt.compare(pin, hashToVerify)
+
+    let pinValid = false
+    let needsHashUpgrade = false
+
+    if (isBcryptHash(hashToVerify)) {
+      pinValid = await bcrypt.compare(pin, hashToVerify)
+    } else {
+      // Plaintext PIN stored directly (school pupils imported from wrife.co.uk)
+      pinValid = (pin === hashToVerify)
+      if (pinValid) needsHashUpgrade = true
+    }
+
     if (!pinValid) return err(401, 'invalid_credentials', 'Class code, username, or PIN is incorrect.')
 
-    // 5. Ensure auth user exists — email format matches wrife.co.uk so the same
-    //    auth user is reused regardless of which app the pupil first logged in from.
+    // 5. Ensure auth user exists
     const authEmail = `pupil-${pupil.id}@practice.wrife.co.uk`
     let authUserId = pupil.auth_user_id as string | null
 
@@ -107,7 +114,7 @@ Deno.serve(async (req) => {
       const initialPass = generateRandomPassword()
       const displayName = pupil.display_name ?? pupil.first_name ?? username
       const { data: created, error: createErr } = await admin.auth.admin.createUser({
-        id: pupil.id,           // auth.uid() === pupils.id for RLS
+        id: pupil.id,
         email: authEmail,
         password: initialPass,
         email_confirm: true,
@@ -134,7 +141,15 @@ Deno.serve(async (req) => {
       return err(500, 'auth_signin_failed', signInErr?.message ?? 'sign-in failed')
     }
 
-    // 7. Ensure dwp_progress row exists
+    // 7. Upgrade plaintext PIN to bcrypt (non-blocking, best-effort)
+    if (needsHashUpgrade) {
+      try {
+        const newHash = bcrypt.hashSync(pin, 10)
+        await admin.from('pupils').update({ password_hash: newHash }).eq('id', pupil.id)
+      } catch (_e) { /* non-fatal — next login will upgrade again */ }
+    }
+
+    // 8. Ensure dwp_progress row exists
     await admin.from('dwp_progress').upsert({
       pupil_id: pupil.id,
       class_id: classRow.id,
