@@ -38,27 +38,44 @@ export default function PathNode({ level, state }: Props) {
       )}
       {state === 'completed' && (
         <div
-          className="rounded-full bg-brand-primary flex items-center justify-center relative"
-          style={{ width: baseSize, height: baseSize, borderBottom: '4px solid #3d35a0' }}
+          className="rounded-full flex items-center justify-center relative"
+          style={{
+            width: baseSize, height: baseSize,
+            background: 'radial-gradient(ellipse at 38% 32%, #9B8FF7 0%, #6C5CE7 55%, #4A3DAD 100%)',
+            boxShadow: 'inset 0 3px 8px rgba(255,255,255,0.28), inset 0 -2px 6px rgba(0,0,0,0.18), 0 5px 0 #3d35a0, 0 8px 18px rgba(61,53,160,0.33)',
+          }}
         >
           <span className="text-white text-2xl" aria-hidden="true">✓</span>
-          <span className="absolute -top-1.5 -right-1.5 bg-brand-secondary rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+          <span
+            className="absolute -top-1.5 -right-1.5 rounded-full w-5 h-5 flex items-center justify-center border-2 border-white"
+            style={{ background: 'radial-gradient(ellipse at 38% 32%, #FFD08A 0%, #F5A623 55%, #C47010 100%)' }}
+          >
             <span className="text-white text-[9px]" aria-hidden="true">⭐</span>
           </span>
         </div>
       )}
       {state === 'current' && (
         <div
-          className="rounded-full bg-brand-secondary flex items-center justify-center transition-transform group-hover:scale-105"
-          style={{ width: currentSize, height: currentSize, borderBottom: '5px solid #c47a0a', outline: '4px solid #fff3e0' }}
+          className="rounded-full flex items-center justify-center transition-transform group-hover:scale-105"
+          style={{
+            width: currentSize, height: currentSize,
+            background: 'radial-gradient(ellipse at 38% 32%, #FFD08A 0%, #F5A623 55%, #C47010 100%)',
+            boxShadow: 'inset 0 4px 10px rgba(255,255,255,0.28), inset 0 -3px 8px rgba(0,0,0,0.18), 0 6px 0 #A85F0A, 0 10px 24px rgba(168,95,10,0.35)',
+            outline: '4px solid #fff3e0',
+            outlineOffset: '2px',
+          }}
         >
           <span className="text-white text-2xl" aria-hidden="true">✏️</span>
         </div>
       )}
       {state === 'locked' && (
         <div
-          className="rounded-full bg-neutral-300 flex items-center justify-center"
-          style={{ width: baseSize - 4, height: baseSize - 4, borderBottom: '4px solid #bbb' }}
+          className="rounded-full flex items-center justify-center"
+          style={{
+            width: baseSize - 4, height: baseSize - 4,
+            background: 'radial-gradient(ellipse at 38% 32%, #E5E7EB 0%, #C8CBD0 55%, #9CA3AF 100%)',
+            boxShadow: 'inset 0 3px 7px rgba(255,255,255,0.45), inset 0 -2px 5px rgba(0,0,0,0.12), 0 4px 0 #9CA3AF',
+          }}
         >
           <span className="text-neutral-500 text-xl" aria-hidden="true">🔒</span>
         </div>
