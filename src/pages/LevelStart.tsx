@@ -45,7 +45,7 @@ export default function LevelStart() {
         <div className="flex-1">
           <div className="flex items-start justify-between gap-3 mb-1.5">
             <p className="text-pwp-base font-bold text-neutral-800">{level.prompt_title}</p>
-            <TTSPlayer src={levelIntroUrl(level.level_id)} label="Hear it" size="sm" />
+            <TTSPlayer src={levelIntroUrl(level.level_id)} label="Hear it" size="sm" autoPlay />
           </div>
           <p className="text-pwp-base text-neutral-700">{level.prompt_instructions}</p>
           {level.prompt_example && (

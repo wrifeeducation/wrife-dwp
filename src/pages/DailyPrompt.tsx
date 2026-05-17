@@ -106,7 +106,7 @@ export default function DailyPrompt() {
       <section className="px-5 py-5">
         <div className="bg-surface-prompt-chip rounded-pwp-tile px-4 py-3 border-l-[3px] border-brand-secondary flex items-start gap-3 mb-4">
           <p className="text-pwp-base text-neutral-800 flex-1">{prompt.prompt_text}</p>
-          <TTSPlayer src={dailyPromptUrl(prompt.prompt_slug)} label="Hear it" size="sm" />
+          <TTSPlayer src={dailyPromptUrl(prompt.prompt_slug)} label="Hear it" size="sm" autoPlay />
         </div>
 
         <OralRehearsalPanel onDraftReady={setOralDraft} />
