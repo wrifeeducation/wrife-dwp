@@ -24,7 +24,7 @@ export function useWebSpeech(lang = 'en-GB') {
     const SR = (window as SR).SpeechRecognition || (window as SR).webkitSpeechRecognition
     if (!SR) { setSupported(false); return }
     const r = new SR()
-    r.continuous = false
+    r.continuous = true
     r.interimResults = true
     r.lang = lang
     r.onresult = (event: any) => {
