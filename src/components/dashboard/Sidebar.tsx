@@ -55,7 +55,7 @@ export default function Sidebar({ pupilName, progress }: Props) {
     >
       {/* Back to WriFe Hub — only when Route A entry */}
       {isHubEntry() && (
-        <a href={`${wrifeHubUrl()}/pupil/dashboard`} className="text-white/60 text-pwp-xs hover:text-white/95">
+        <a href={wrifeHubUrl()} className="text-white/60 text-pwp-xs hover:text-white/95">
           ← WriFe Hub
         </a>
       )}

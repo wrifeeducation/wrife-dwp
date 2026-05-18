@@ -15,6 +15,7 @@ import ParentView from '@/pages/ParentView'
 import TeacherView from '@/pages/TeacherView'
 import NotFound from '@/pages/NotFound'
 import AuthConfirm from '@/pages/AuthConfirm'
+import FeedbackWidget from '@/components/FeedbackWidget'
 import AccountLogin from '@/pages/AccountLogin'
 
 /**
@@ -35,6 +36,7 @@ export default function App() {
   }, [])
 
   return (
+    <>
     <Routes>
       {/* Pupil routes */}
       <Route path="/" element={<Home />} />
@@ -62,5 +64,7 @@ export default function App() {
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
+    <FeedbackWidget />
+    </>
   )
 }

@@ -20,6 +20,7 @@ export default function Login() {
   const [classCode, setClassCode] = useState('')
   const [username, setUsername] = useState('')
   const [pin, setPin] = useState('')
+  const [showPin, setShowPin] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -104,18 +105,31 @@ export default function Login() {
 
         <label className="block">
           <span className="text-pwp-xs font-extrabold text-neutral-700 uppercase tracking-wide mb-1.5 block">4-digit PIN</span>
-          <input
-            type="password"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            autoComplete="current-password"
-            value={pin}
-            onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-            maxLength={4}
-            required
-            className="w-full px-4 py-3 rounded-pwp-tile bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary focus:outline-none text-pwp-xl font-extrabold tracking-[0.5em] text-center"
-            placeholder="••••"
-          />
+          <div className="relative">
+            <input
+              type={showPin ? 'text' : 'password'}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="current-password"
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              maxLength={4}
+              required
+              className="w-full px-4 py-3 pr-12 rounded-pwp-tile bg-surface-practice-bg border-2 border-brand-primary/30 focus:border-brand-primary focus:outline-none text-pwp-xl font-extrabold tracking-[0.5em] text-center"
+              placeholder="••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPin((v) => !v)}
+              aria-label={showPin ? 'Hide PIN' : 'Show PIN'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-brand-primary text-lg bg-transparent border-0 cursor-pointer p-1"
+            >
+              {showPin ? '🙈' : '👁️'}
+            </button>
+          </div>
+          <p className="text-pwp-xs text-neutral-400 mt-1.5 text-center">
+            Forgotten your PIN? Ask your teacher.
+          </p>
         </label>
 
         <button
