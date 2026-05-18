@@ -1,12 +1,13 @@
 # WriFe DWP (Daily Writing Practice)
-*Last updated: 2026-05-16 · Session 4*
+*Last updated: 2026-05-18 · Session 5*
 
 ## Current state
-`dailywrite.wrife.co.uk` is fully operational. Pupil login (Route B) works for all pupil types. Audio is live — all 405 ElevenLabs MP3s (365 daily prompts + 40 level intros) are uploaded to the `dwp-audio` Supabase Storage bucket and confirmed playing at HTTP 200. Esma K (Silver Birch) tested end-to-end: login → level 1 intro audio plays. Direct sign-up routes exist for home learners (Route C) and independent teachers (Route D) but have no Stripe paywall yet.
+`dailywrite.wrife.co.uk` is fully operational. **Session 5 (2026-05-18):** DWP SSO fixed — `flowType: 'pkce'` removed from `src/lib/supabase.ts`; synchronous hash-token detection added before `createClient()` so school pupils arriving via Route A are correctly auto-authenticated. `wrifeHubUrl()` in `src/lib/auth/hubEntry.ts` now returns full `/pupil/dashboard` path; `BackToWriFe.tsx` updated to avoid double-path bug.
+ Pupil login (Route B) works for all pupil types. Audio is live — all 405 ElevenLabs MP3s (365 daily prompts + 40 level intros) are uploaded to the `dwp-audio` Supabase Storage bucket and confirmed playing at HTTP 200. Esma K (Silver Birch) tested end-to-end: login → level 1 intro audio plays. Direct sign-up routes exist for home learners (Route C) and independent teachers (Route D) but have no Stripe paywall yet.
 
 ## Next steps
 1. **Add Stripe paywall to Route C/D sign-up** — `/home-signup` and `/teacher-signup` currently create accounts with no payment; add Stripe checkout before account creation completes
-2. **Commit and push v19 Edge Function** — `git add supabase/functions/pupil-login/index.ts && git commit -m "fix(pupil-login): v19 — default bcrypt import" && git push origin main`
+2. ✅ **DWP SSO fixed (Session 5)** — `flowType: 'pkce'` removed; hash-token detection added; shipped.
 3. **Add DWP SSO tile to wrife.co.uk teacher dashboard** — school teachers have no tile to reach DWP from the hub
 4. **Apply pending wrife-website migrations** — `20260511_school_registrations.sql` and `20260511000001_ai_attempts.sql`
 
@@ -37,6 +38,7 @@
 
 | # | Date | Summary |
 |---|------|---------|
+| 5 | 2026-05-18 | DWP SSO fixed: removed flowType pkce from supabase.ts, added synchronous hash-token detection before createClient(). wrifeHubUrl() returns full /pupil/dashboard path. BackToWriFe.tsx double-path bug fixed. TypeScript clean. |
 | 4 | 2026-05-16 | Fixed audio: uploaded 405 MP3s to dwp-audio Supabase bucket via upload script; confirmed HTTP 200 + audio plays live for Esma K / Silver Birch |
 | 3 | 2026-05-16 | Diagnosed and fixed bcrypt bug in pupil-login (v19): `import * as bcrypt` silently breaks all bcrypt calls on esm.sh; switched to default import |
 | 2 | 2026-05-16 | Fixed ElevenLabs audio pipeline; fixed full DWP auth for teachers + pupils; fixed schema column name bugs |
