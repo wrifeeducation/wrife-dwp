@@ -12,6 +12,7 @@ import { useLevels } from '@/hooks/useLevels'
 import { useProgress } from '@/hooks/useProgress'
 import { deriveLevelStates, groupByTier } from '@/lib/progress/levels'
 import { supabase } from '@/lib/supabase'
+import { DemoBanner } from '@/components/shell/DemoBanner'
 
 /**
  * Pupil dashboard — two-column layout matching the PWP Studio pattern.
@@ -48,6 +49,9 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-surface-pupil">
+      {/* Demo mode floating banner */}
+      <DemoBanner />
+
       {/* Desktop sidebar — hidden on mobile via tailwind responsive class */}
       <Sidebar pupilName={pupilName} progress={progress} />
 
