@@ -12,6 +12,17 @@ if (!url || !anonKey) {
   )
 }
 
+// ── Route A (school hub SSO) detection ──────────────────────────────────────
+// School pupils arrive via: https://dailywrite.wrife.co.uk#access_token=...
+// We MUST read the hash BEFORE createClient() is called — the Supabase SDK
+// processes and clears the hash asynchronously on init, creating a race
+// condition if we check later (e.g. in useEffect). Read it synchronously here.
+// sessionStorage clears on tab close so a fresh direct visit never shows the
+// ← WriFe back button.
+if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
+  sessionStorage.setItem('entryViaHub', '1')
+}
+
 /**
  * Single Supabase client for the DWP sub-app.
  *
@@ -25,12 +36,15 @@ if (!url || !anonKey) {
  * detectSessionInUrl: true is REQUIRED for Route A hash-token auto-detection.
  * When a school pupil arrives from wrife.co.uk with a JWT in the URL hash,
  * the Supabase SDK detects it automatically and calls setSession().
+ *
+ * flowType is intentionally NOT set to 'pkce' — PKCE flow expects a ?code=
+ * parameter, not an #access_token= hash. The Route A SSO uses the implicit
+ * hash token format, which is incompatible with PKCE mode.
  */
 export const supabase = createClient<Database>(url, anonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
   },
 })
